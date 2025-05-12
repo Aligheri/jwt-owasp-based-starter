@@ -10,7 +10,6 @@ import lombok.*;
 @NoArgsConstructor
 @Entity
 public class UserStatus {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,3 +24,4 @@ public class UserStatus {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 }
+

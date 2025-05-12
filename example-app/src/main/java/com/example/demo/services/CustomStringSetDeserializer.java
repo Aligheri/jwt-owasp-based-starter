@@ -3,11 +3,12 @@ package com.example.demo.services;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-
+@Service
 public class CustomStringSetDeserializer extends JsonDeserializer<Set<String>> {
     @Override
     public Set<String> deserialize(JsonParser p, DeserializationContext context)

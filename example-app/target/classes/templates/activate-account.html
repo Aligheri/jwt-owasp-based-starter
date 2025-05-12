@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Activation</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        .container {
+            max-width: 600px;
+            text-align: center;
+        }
+        .message {
+            margin: 20px 0;
+            font-size: 18px;
+            line-height: 1.5;
+        }
+        .activation-form {
+            margin: 30px auto;
+            max-width: 300px;
+            text-align: left;
+        }
+        .success-message {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .error-message {
+            color: #f44336;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Account Activation</h1>
+
+        <div class="message">
+            Please enter the activation code that was sent to your email address.
+        </div>
+
+        <div id="activation-form" class="activation-form">
+            <div class="form-group">
+                <label for="activationCode">Activation Code:</label>
+                <input type="text" id="activationCode" name="activationCode" required>
+            </div>
+            <button id="activateBtn" class="button">Activate Account</button>
+        </div>
+
+        <div id="success-message" class="success-message" style="display: none;">
+            Your account has been successfully activated! You will be redirected to the login page.
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;"></div>
+
+        <div id="resend-form" class="activation-form" style="margin-top: 30px; display: none;">
+            <h3>Didn't receive the code?</h3>
+            <div class="form-group">
+                <label for="email">Your Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <button id="resendBtn" class="button">Resend Activation Code</button>
+            <div id="resend-message" style="margin-top: 10px; display: none;"></div>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <a href="/login" class="button">Go to Login</a>
+            <button id="showResendBtn" class="button" style="background-color: #f0ad4e;">Need a new code?</button>
+        </div>
+    </div>
+
+    <script th:src="@{/js/auth.js}"></script>
+    <script>
+        // Check if already authenticated
+        if (isAuthenticated()) {
+            window.location.href = '/dashboard';
+        }
+
+        // Check for activation token in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        if (token) {
+            // Auto-fill the activation code field
+            document.getElementById('activationCode').value = token;
+            // Automatically submit the form if token is in URL
+            activateAccount(token);
+        }
+
+        document.getElementById('activateBtn').addEventListener('click', function() {
+            const code = document.getElementById('activationCode').value.trim();
+            if (code) {
+                activateAccount(code);
+            }
+        });
+
+        // Show/hide resend form
+        document.getElementById('showResendBtn').addEventListener('click', function() {
+            document.getElementById('resend-form').style.display = 'block';
+            this.style.display = 'none';
+        });
+
+        // Handle resend button click
+        document.getElementById('resendBtn').addEventListener('click', function() {
+            const email = document.getElementById('email').value.trim();
+            if (email) {
+                resendActivationCode(email);
+            }
+        });
+
+        function activateAccount(code) {
+            fetch(`/api/auth/activate-account?token=${code}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Activation failed. Please check your code and try again.');
+                    }
+
+                    // Show success message
+                    document.getElementById('activation-form').style.display = 'none';
+                    document.getElementById('success-message').style.display = 'block';
+
+                    // Redirect to login page after 3 seconds
+                    setTimeout(function() {
+                        window.location.href = '/login';
+                    }, 3000);
+                })
+                .catch(error => {
+                    const errorMessage = document.getElementById('error-message');
+                    errorMessage.textContent = error.message;
+                    errorMessage.style.display = 'block';
+                });
+        }
+
+        function resendActivationCode(email) {
+            const resendMessage = document.getElementById('resend-message');
+            resendMessage.style.display = 'none';
+
+            fetch(`/api/auth/resend-activation?email=${encodeURIComponent(email)}`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                resendMessage.textContent = data.message;
+                resendMessage.style.color = data.message.startsWith('Error') ? '#f44336' : '#4CAF50';
+                resendMessage.style.display = 'block';
+            })
+            .catch(error => {
+                resendMessage.textContent = 'Error: ' + error.message;
+                resendMessage.style.color = '#f44336';
+                resendMessage.style.display = 'block';
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div class="container">
+    <h1>Authentication Dashboard</h1>
+
+    <div class="info-box">
+        <div class="info-title">JWT Token:</div>
+        <div id="token-display" class="token-display">Loading...</div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-title">Fingerprint Cookie:</div>
+        <div id="cookie-display" class="token-display">Loading...</div>
+    </div>
+
+    <div style="text-align: center;">
+        <button id="logoutBtn" class="button logout">Logout</button>
+    </div>
+</div>
+
+<script th:src="@{/js/auth.js}"></script>
+<script>
+    // Check if authenticated, if not redirect to login
+    if (!isAuthenticated()) {
+        window.location.href = '/login';
+    }
+
+    // Display the JW T token
+    const token = getToken();
+    document.getElementById('token-display').textContent = token || "No token found";
+
+    // Display the fingerprint cookie
+
+    document.getElementById('cookie-display').textContent = "See in DevTools → Application → Cookies";
+
+    // Handle logout
+    document.getElementById('logoutBtn').addEventListener('click', function () {
+        logout()
+            .then(() => {
+                // Redirect to logout page
+                window.location.href = '/logout';
+            })
+            .catch(error => {
+                console.error('Logout error:', error);
+                alert('Logout failed: ' + error.message);
+
+                // If token is missing, redirect to login anyway
+                if (error.message === 'No token found') {
+                    window.location.href = '/login';
+                }
+            });
+    });
+</script>
+</body>
+</html>

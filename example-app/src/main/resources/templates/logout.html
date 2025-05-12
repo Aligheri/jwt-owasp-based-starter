@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logged Out</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        .container {
+            max-width: 500px;
+            text-align: center;
+        }
+        .message {
+            margin: 20px 0;
+            font-size: 18px;
+        }
+        .info-box {
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Logged Out Successfully</h1>
+        <div class="message">You have been successfully logged out.</div>
+
+        <div class="info-box">
+            <div class="info-title">JWT Token Status:</div>
+            <div id="token-status" class="token-display">Removed from browser storage</div>
+        </div>
+
+        <div class="info-box">
+            <div class="info-title">Fingerprint Cookie Status:</div>
+            <div id="cookie-status" class="token-display">Checking...</div>
+        </div>
+
+        <a href="/login" class="button">Back to Login</a>
+    </div>
+
+    <script th:src="@{/js/auth.js}"></script>
+    <script>
+        document.getElementById('cookie-status').textContent = 
+            hasFingerprintCookie() ? "Cookie still exists (not properly removed)" : "Successfully removed";
+
+        // Clear any remaining token just to be safe
+        removeToken();
+
+        // Redirect to login after 5 seconds
+        setTimeout(function() {
+            window.location.href = '/login';
+        }, 5000);
+    </script>
+</body>
+</html>

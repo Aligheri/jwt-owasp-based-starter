@@ -1,0 +1,96 @@
+package com.yevsieiev.authstarter.config;
+
+import com.yevsieiev.authstarter.jwt.AuthEntryPointJwt;
+import com.yevsieiev.authstarter.jwt.JwtAuthenticationFilter;
+import com.yevsieiev.authstarter.jwt.JwtUtils;
+import com.yevsieiev.authstarter.jwt.TokenCipher;
+import com.yevsieiev.authstarter.jwt.TokenRevoker;
+import com.yevsieiev.authstarter.repository.RevokedTokenRepository;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.security.GeneralSecurityException;
+
+/**
+ * Auto-configuration for JWT authentication.
+ */
+@AutoConfiguration
+@ConditionalOnClass({ EnableWebSecurity.class })
+@ConditionalOnProperty(name = "jwt.auth.enabled", havingValue = "true", matchIfMissing = true)
+@EnableJpaRepositories(basePackages = "com.yevsieiev.authstarter.repository")
+@EntityScan(basePackages = "com.yevsieiev.authstarter.entity")
+@EnableConfigurationProperties(ValidationProperties.class)
+public class AuthAutoConfiguration {
+
+
+
+    @Bean
+    @ConditionalOnMissingBean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean(UserDetailsService.class)
+    public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder);
+        return authProvider;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean(AuthenticationConfiguration.class)
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public AuthEntryPointJwt authEntryPointJwt() {
+        return new AuthEntryPointJwt();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public TokenCipher tokenCipher() throws GeneralSecurityException {
+        return new TokenCipher();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public TokenRevoker tokenRevoker(RevokedTokenRepository revokedTokenRepository, TokenCipher tokenCipher) {
+        return new TokenRevoker(revokedTokenRepository, tokenCipher);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean(TokenRevoker.class)
+    public JwtUtils jwtUtils(ValidationProperties validationProperties ,TokenCipher tokenCipher, TokenRevoker tokenRevoker ) {
+        return new JwtUtils(validationProperties, tokenCipher, tokenRevoker);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean({UserDetailsService.class, JwtUtils.class})
+    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtUtils jwtUtils, UserDetailsService userDetailsService) {
+        return new JwtAuthenticationFilter(jwtUtils, userDetailsService);
+    }
+}

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .container {
+            max-width: 500px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Login</h1>
+        <div th:if="${error}" class="error-message" th:text="${error}"></div>
+        <div id="login-error" class="error-message" style="display: none;"></div>
+        <div class="info-message" style="margin-bottom: 15px; color: #3498db;">
+            <p>Note: You must activate your account before logging in. Check your email for the activation code.</p>
+            <p>If you haven't activated your account yet, <a href="/activate-account">click here</a> to enter your activation code.</p>
+        </div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        <div class="container unauthenticated">
+            With GitHub: <a href="/oauth2/authorization/github">click here</a>
+        </div>
+        <div class="container authenticated" style="display:none">
+            Logged in as: <span id="user"></span>
+        </div>
+        <div style="margin-top: 20px; text-align: center;">
+            <p>Don't have an account? <a href="/register">Register here</a></p>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $.get("/user", function(data) {
+            if (data.name) {
+                $("#user").html(data.name);
+                $(".unauthenticated").hide()
+                $(".authenticated").show()
+
+                // Store JWT token if available
+                if (data.token) {
+                    console.log("Storing JWT token from OAuth login");
+                    setToken(data.token);
+                }
+
+                // Redirect to dashboard if authenticated via OAuth
+                window.location.href = '/dashboard';
+            } else {
+                console.log("Not authenticated via OAuth");
+            }
+        }).fail(function() {
+            console.log("Error checking OAuth authentication");
+        });
+    </script>
+    <script th:src="@{/js/auth.js}"></script>
+    <script>
+        // Check if already authenticated
+        if (isAuthenticated()) {
+            window.location.href = '/dashboard';
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            login(username, password)
+                .then(() => {
+                    // Redirect to dashboard
+                    window.location.href = '/dashboard';
+                })
+                .catch(error => {
+                    const loginError = document.getElementById('login-error');
+                    let errorMessage = 'Login failed: ' + error.message;
+
+                    // Check if the error is related to account activation
+                    if (error.message.includes('disabled') || error.message.includes('enabled') || 
+                        error.message.includes('activate') || error.message.includes('activation')) {
+                        errorMessage = 'Your account is not activated. Please check your email for the activation code or <a href="/activate-account">click here</a> to enter it manually.';
+                    }
+
+                    loginError.innerHTML = errorMessage;
+                    loginError.style.display = 'block';
+                });
+        });
+    </script>
+</body>
+</html>

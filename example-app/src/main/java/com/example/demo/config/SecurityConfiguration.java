@@ -1,7 +1,7 @@
 package com.example.demo.config;
 
-import com.example.demo.jwt.AuthEntryPointJwt;
-import com.example.demo.jwt.JwtAuthenticationFilter;
+import com.yevsieiev.authstarter.jwt.AuthEntryPointJwt;
+import com.yevsieiev.authstarter.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,32 +35,37 @@ public class SecurityConfiguration extends SecurityConfigurerAdapter<DefaultSecu
         http
                 .cors(withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
+                // Disable frame options for H2 console
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(unauthorizedHandler)
                 )
+
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(STATELESS)
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("api/auth/**",
-                                "/auth/**",
-                                "/v2/api-docs",
-                                "/v3/api-docs",
-                                "/v3/api-docs/**",
-                                "/swagger-resources",
-                                "/swagger-resources/**",
-                                "/configuration/ui",
-                                "/configuration/security",
-                                "/swagger-ui/**",
-                                "/webjars/**",
-                                ("/public/**"),
-                                "/swagger-ui.html").permitAll()
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/api/auth/**",
+                                "api/auth/register",
+                                "/",
+                                "/auth.js",
+                                "/css/**",
+                                "/js/**",
+                                "/login",
+                                "/dashboard",
+                                "/logout",
+                                "/register",
+                                "/activate-account",
+                                "/h2-console/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/user").permitAll()
                         .anyRequest().authenticated()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/dashboard", true)
                 )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 }
