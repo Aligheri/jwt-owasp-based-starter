@@ -14,4 +14,6 @@ public class ValidationProperties {
 
     private String secretKey;
     private String issuerId;
+    private long tokenValidityInSeconds;
+    private String symmetricKey;
 }

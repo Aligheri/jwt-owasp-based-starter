@@ -66,6 +66,7 @@ function login(username, password) {
     })
     .then(data => {
         setToken(data.token);
+        console.log(data);
         return data;
     });
 }

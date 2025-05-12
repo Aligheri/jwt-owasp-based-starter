@@ -57,6 +57,8 @@ public abstract class DefaultAuthenticationService implements AuthenticationServ
             // Cipher the JWT for security
             String cipheredJwt = tokenCipher.cipherToken(jwt);
 
+            System.out.println(cipheredJwt);
+
             // Create and return the authentication response
             return DefaultAuthResponse.builder()
                     .accessToken(cipheredJwt)

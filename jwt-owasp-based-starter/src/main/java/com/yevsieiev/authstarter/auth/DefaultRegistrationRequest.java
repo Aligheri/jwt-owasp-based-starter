@@ -8,13 +8,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Collection;
+
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Базовая реализация RegisterRequest
- */
+
 @Data
 @Builder
 @AllArgsConstructor
