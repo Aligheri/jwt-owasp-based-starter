@@ -1,8 +1,6 @@
 package com.yevsieiev.authstarter.service;
 
-import com.yevsieiev.authstarter.auth.AuthRequest;
-import com.yevsieiev.authstarter.auth.AuthResponse;
-import com.yevsieiev.authstarter.auth.RegistrationRequest;
+import com.yevsieiev.authstarter.auth.*;
 import com.yevsieiev.authstarter.dto.MessageResponse;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -27,7 +25,7 @@ public interface AuthenticationService {
      * @param issuerId the issuer ID for the JWT
      * @return an authentication response containing the JWT token and user details
      */
-    AuthResponse authenticateUser(AuthRequest loginRequest, HttpServletResponse response, String issuerId);
+    DefaultAuthResponse authenticateUser(DefaultLoginRequest loginRequest, HttpServletResponse response, String issuerId);
     
     /**
      * Logout a user

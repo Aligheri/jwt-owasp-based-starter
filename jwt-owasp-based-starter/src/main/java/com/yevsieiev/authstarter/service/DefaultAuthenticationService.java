@@ -5,7 +5,6 @@ import com.yevsieiev.authstarter.dto.MessageResponse;
 import com.yevsieiev.authstarter.jwt.JwtUtils;
 import com.yevsieiev.authstarter.jwt.TokenCipher;
 import com.yevsieiev.authstarter.jwt.TokenRevoker;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -14,12 +13,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.security.GeneralSecurityException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Collections;
 
 /**
  * Default implementation of the AuthenticationService interfaceF
@@ -38,8 +31,7 @@ public abstract class DefaultAuthenticationService implements AuthenticationServ
     @Override
     public abstract MessageResponse registerUser(RegistrationRequest registrationRequest);
 
-    @Override
-    public AuthResponse authenticateUser(AuthRequest loginRequest, HttpServletResponse response, String issuerId) {
+    public DefaultAuthResponse authenticateUser(DefaultLoginRequest loginRequest, HttpServletResponse response, String issuerId) {
         try {
             // Authenticate the user
             Authentication authentication = authenticationManager.authenticate(

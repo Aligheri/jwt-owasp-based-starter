@@ -2,6 +2,7 @@ package com.yevsieiev.authstarter.controller;
 
 import com.yevsieiev.authstarter.auth.AuthRequest;
 import com.yevsieiev.authstarter.auth.AuthResponse;
+import com.yevsieiev.authstarter.auth.DefaultLoginRequest;
 import com.yevsieiev.authstarter.auth.RegistrationRequest;
 import com.yevsieiev.authstarter.config.ValidationProperties;
 import com.yevsieiev.authstarter.dto.MessageResponse;
@@ -59,7 +60,7 @@ public class AuthenticationController {
      * @return a response entity with an authentication response
      */
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> loginUser(@Valid @RequestBody AuthRequest loginRequest, HttpServletResponse response) {
+    public ResponseEntity<AuthResponse> loginUser(@Valid @RequestBody DefaultLoginRequest loginRequest, HttpServletResponse response) {
         logger.info("Attempting to authenticate user: {}", loginRequest.getUsername());
         return ResponseEntity.ok(authenticationService.authenticateUser(loginRequest, response, validationProperties.getIssuerId()));
     }

@@ -1,9 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.services.AuthenticationService;
-import com.yevsieiev.authstarter.auth.AuthRequest;
-import com.yevsieiev.authstarter.auth.AuthResponse;
-import com.yevsieiev.authstarter.auth.RegistrationRequest;
+import com.yevsieiev.authstarter.auth.*;
 import com.yevsieiev.authstarter.dto.MessageResponse;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,7 +13,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.NoSuchAlgorithmException;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -56,11 +53,11 @@ public class AuthController {
      * Authenticate a user
      *
      * @param loginRequest the login request
-     * @param response the HTTP servlet response
+     * @param response     the HTTP servlet response
      * @return a response entity with an authentication response
      */
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> loginUser(@Valid @RequestBody AuthRequest loginRequest, HttpServletResponse response) throws NoSuchAlgorithmException {
+    public ResponseEntity<AuthResponse> loginUser(@Valid @RequestBody DefaultLoginRequest loginRequest, HttpServletResponse response) {
         logger.info("Attempting to authenticate user: {}", loginRequest.getUsername());
         return ResponseEntity.ok(authenticationService.authenticateUser(loginRequest, response, issuerId));
     }
@@ -68,7 +65,7 @@ public class AuthController {
     /**
      * Logout a user
      *
-     * @param jwt the JWT token
+     * @param jwt      the JWT token
      * @param response the HTTP servlet response
      * @return a message response
      */

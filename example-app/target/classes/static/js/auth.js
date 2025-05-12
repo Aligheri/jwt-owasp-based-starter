@@ -90,7 +90,5 @@ function logout() {
     });
 }
 
-// Function to check if fingerprint cookie exists
-function hasFingerprintCookie() {
-    return getCookie('fingerprint') !== null;
-}
+
+
