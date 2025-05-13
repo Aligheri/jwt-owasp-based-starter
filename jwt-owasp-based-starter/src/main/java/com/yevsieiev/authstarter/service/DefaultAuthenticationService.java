@@ -1,9 +1,9 @@
 package com.yevsieiev.authstarter.service;
 
-import com.yevsieiev.authstarter.dto.response.login.DefaultAuthResponse;
-import com.yevsieiev.authstarter.dto.request.login.DefaultAuthRequest;
-import com.yevsieiev.authstarter.dto.response.register.DefaultRegisterResponse;
-import com.yevsieiev.authstarter.dto.request.register.DefaultRegistrationRequest;
+import com.yevsieiev.authstarter.dto.request.login.AuthRequest;
+import com.yevsieiev.authstarter.dto.request.register.RegisterRequest;
+import com.yevsieiev.authstarter.dto.response.login.AuthResponse;
+import com.yevsieiev.authstarter.dto.response.register.RegisterResponse;
 import com.yevsieiev.authstarter.jwt.JwtUtils;
 import com.yevsieiev.authstarter.jwt.TokenCipher;
 import com.yevsieiev.authstarter.jwt.TokenRevoker;
@@ -16,12 +16,19 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.function.Supplier;
+
 /**
- * Default implementation of the AuthenticationService interfaceF
+ * Default implementation of the AuthenticationService interface
  */
 
 @RequiredArgsConstructor
-public abstract class DefaultAuthenticationService implements AuthenticationService {
+public abstract class DefaultAuthenticationService <
+        T extends AuthRequest,
+        R extends AuthResponse,
+        U extends RegisterRequest,
+        V extends RegisterResponse>
+        implements AuthenticationService<T, R, U, V> {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultAuthenticationService.class);
 
@@ -29,69 +36,73 @@ public abstract class DefaultAuthenticationService implements AuthenticationServ
     private final JwtUtils jwtUtils;
     private final TokenCipher tokenCipher;
     private final TokenRevoker tokenRevoker;
+    private final Supplier<R> authResponseSupplier;
+    private final Supplier<V> registerResponseSupplier;
 
-
-    public abstract DefaultRegisterResponse registerUser(DefaultRegistrationRequest defaultRegistrationRequest);
-
-    public DefaultAuthResponse authenticateUser(DefaultAuthRequest loginRequest, HttpServletResponse response, String issuerId) {
+    @Override
+    public R authenticateUser(T loginRequest, HttpServletResponse response, String issuerId) {
         try {
-            // Authenticate the user
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getIdentifier(),
+                            loginRequest.getPassword()
+                    )
+            );
 
-            // Set the authentication in the security context
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // Generate a fingerprint for the user
             String userFingerprint = jwtUtils.createUserFingerprint();
             logger.debug("Generated userFingerprint: {}", userFingerprint);
 
-            // Create a cookie with the fingerprint
             jwtUtils.createCookie(response, "fingerprint", userFingerprint, 24 * 60 * 60, true);
 
-            // Hash the fingerprint for use in the JWT
             String userFingerprintHash = jwtUtils.hashFingerprint(userFingerprint);
             logger.debug("Generated userFingerprintHash: {}", userFingerprintHash);
 
-            // Generate a JWT for the user
-            String jwt = jwtUtils.generateAccessTokenFromUsername(loginRequest.getUsername(), issuerId, userFingerprintHash);
+            String jwt = jwtUtils.generateAccessTokenFromUsername(
+                    loginRequest.getIdentifier(), issuerId, userFingerprintHash
+            );
 
-            // Cipher the JWT for security
             String cipheredJwt = tokenCipher.cipherToken(jwt);
+            logger.debug("Generated ciphered token: {}", cipheredJwt);
 
-            System.out.println(cipheredJwt);
+            R authResponse = authResponseSupplier.get();
+            authResponse.setToken(cipheredJwt);
+            return authResponse;
 
-            // Create and return the authentication response
-            return DefaultAuthResponse.builder()
-                    .accessToken(cipheredJwt)
-                    .tokenType("Bearer")
-                    .expiresIn(3600L) // 1 hour
-                    .build();
         } catch (Exception e) {
             logger.error("Error during authentication", e);
             throw new RuntimeException("Error during authentication: " + e.getMessage());
         }
     }
 
+    // ❗ Реализация регистрации должна остаться конкретной — это бизнес-логика
     @Override
-    public DefaultRegisterResponse logout(String jwtToken, HttpServletResponse response, String cookieName) {
+    public V registerUser(U registrationRequest) {
+        throw new UnsupportedOperationException("registerUser must be overridden in subclass");
+    }
+
+    // ✅ Logout по умолчанию
+    @Override
+    public V logout(String jwtToken, HttpServletResponse response, String cookieName) {
         try {
-            // Delete the cookie
             jwtUtils.deleteCookie(response, cookieName);
-            // Revoke the token
             tokenRevoker.revokeToken(jwtToken);
-            return new DefaultRegisterResponse("Logged out successfully!");
+
+            V registerResponse = registerResponseSupplier.get();
+            registerResponse.setMessage("Logged out successfully!");
+            return registerResponse;
+
         } catch (Exception e) {
             logger.error("Error during logout", e);
-            return new DefaultRegisterResponse("Error during logout: " + e.getMessage());
+            V registerResponse = registerResponseSupplier.get();
+            registerResponse.setMessage("Error during logout: " + e.getMessage());
+            return registerResponse;
         }
     }
 
-
+    // (опционально) метод активации
     public void activateAccount(String token) {
-        // This is a simplified implementation
-        // In a real application, you would validate the token, find the user,
-        // update their status, etc.
         logger.info("Activating account with token: {}", token);
     }
 }

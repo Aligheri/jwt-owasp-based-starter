@@ -41,7 +41,7 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<DefaultRegisterResponse> registerUser(@Valid @RequestBody DefaultRegistrationRequest registrationRequest) {
         logger.info("Attempting to register user: {}", registrationRequest.getUsername());
-        DefaultRegisterResponse defaultRegisterResponse = authenticationService.registerUser(registrationRequest);
+        DefaultRegisterResponse defaultRegisterResponse = (DefaultRegisterResponse) authenticationService.registerUser(registrationRequest);
         if (defaultRegisterResponse.getMessage().startsWith("Error:")) {
             logger.warn("Registration error: {}", defaultRegisterResponse.getMessage());
             return ResponseEntity.badRequest().body(defaultRegisterResponse);
@@ -80,7 +80,7 @@ public class AuthenticationController {
             logger.debug("Token received for logout: {}", jwt);
 
             try {
-                DefaultRegisterResponse defaultRegisterResponse = authenticationService.logout(jwt, response, "fingerprint");
+                DefaultRegisterResponse defaultRegisterResponse = (DefaultRegisterResponse) authenticationService.logout(jwt, response, "fingerprint");
                 return ResponseEntity.ok(defaultRegisterResponse);
             } catch (IllegalArgumentException e) {
                 logger.error("Base64 decoding error in logout method: {}", e.getMessage(), e);

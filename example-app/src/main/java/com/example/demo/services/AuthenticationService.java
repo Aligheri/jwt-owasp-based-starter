@@ -7,7 +7,9 @@ import com.example.demo.entities.User;
 import com.example.demo.entities.UserStatus;
 import com.example.demo.repositories.TokenRepository;
 import com.example.demo.repositories.UserRepository;
+import com.yevsieiev.authstarter.dto.request.login.DefaultAuthRequest;
 import com.yevsieiev.authstarter.dto.request.register.DefaultRegistrationRequest;
+import com.yevsieiev.authstarter.dto.response.login.DefaultAuthResponse;
 import com.yevsieiev.authstarter.dto.response.register.DefaultRegisterResponse;
 import com.yevsieiev.authstarter.jwt.JwtUtils;
 import com.yevsieiev.authstarter.jwt.TokenCipher;
@@ -21,9 +23,14 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.function.Supplier;
 
 @Service
-public class AuthenticationService extends DefaultAuthenticationService {
+public class AuthenticationService extends DefaultAuthenticationService<
+        DefaultAuthRequest,
+        DefaultAuthResponse,
+        DefaultRegistrationRequest,
+        DefaultRegisterResponse>  {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -32,8 +39,24 @@ public class AuthenticationService extends DefaultAuthenticationService {
 
     private static final String activationUrl = "http://localhost:8080/activate?token=";
 
-    public AuthenticationService(AuthenticationManager authenticationManager, JwtUtils jwtUtils, TokenCipher tokenCipher, TokenRevoker tokenRevoker, UserRepository userRepository, PasswordEncoder passwordEncoder, TokenRepository tokenRepository, EmailService emailService) {
-        super(authenticationManager, jwtUtils, tokenCipher, tokenRevoker);
+    public AuthenticationService(
+            AuthenticationManager authenticationManager,
+            JwtUtils jwtUtils,
+            TokenCipher tokenCipher,
+            TokenRevoker tokenRevoker,
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            TokenRepository tokenRepository,
+            EmailService emailService
+    ) {
+        super(
+                authenticationManager,
+                jwtUtils,
+                tokenCipher,
+                tokenRevoker,
+                DefaultAuthResponse::new,         // <- Supplier
+                DefaultRegisterResponse::new      // <- Supplier
+        );
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenRepository = tokenRepository;
@@ -54,7 +77,7 @@ public class AuthenticationService extends DefaultAuthenticationService {
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        // если не нужна email-активация
+
         userRepository.save(user);
         try {
             sendValidationEmail(user);

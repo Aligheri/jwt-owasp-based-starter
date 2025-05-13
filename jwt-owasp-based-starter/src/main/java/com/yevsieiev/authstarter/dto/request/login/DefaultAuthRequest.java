@@ -22,4 +22,9 @@ public class DefaultAuthRequest implements AuthRequest {
     @NotBlank
     @Size(min = 6)
     private String password;
+
+    @Override
+    public String getIdentifier() {
+        return username;
+    }
 }

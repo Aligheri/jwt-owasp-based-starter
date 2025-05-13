@@ -6,6 +6,6 @@ import java.time.Instant;
  * Интерфейс для ответа аутентификации
  */
 public interface AuthResponse {
-    String getAccessToken();
-    Long getExpiresIn();
+    String getToken();
+    void setToken(String token);
 }
