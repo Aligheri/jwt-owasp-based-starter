@@ -78,14 +78,12 @@ public class WebController {
         }
 
         try {
-            // Generate user fingerprint and store it in a cookie
+
             String userFingerprint = jwtUtils.createUserFingerprint();
             jwtUtils.createCookie(response, "fingerprint", userFingerprint, 24 * 60 * 60, true);
 
-            // Hash the fingerprint
             String userFingerprintHash = jwtUtils.hashFingerprint(userFingerprint);
 
-            // Generate JWT token
             String username = principal.getAttribute("login");
             if (username == null) {
                 username = principal.getAttribute("name");
@@ -93,10 +91,8 @@ public class WebController {
 
             String jwt = jwtUtils.generateAccessTokenFromUsername(username, issuerId, userFingerprintHash);
 
-            // Cipher the JWT token
             String cipheredJwt = tokenCipher.cipherToken(jwt);
 
-            // Return the token and user details
             Map<String, Object> result = new HashMap<>();
             result.put("name", principal.getAttribute("name"));
             result.put("token", cipheredJwt);

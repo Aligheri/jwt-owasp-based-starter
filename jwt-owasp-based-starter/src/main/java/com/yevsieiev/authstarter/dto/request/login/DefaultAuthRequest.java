@@ -7,9 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Базовая реализация LoginRequest
- */
 @Data
 @Builder
 @AllArgsConstructor

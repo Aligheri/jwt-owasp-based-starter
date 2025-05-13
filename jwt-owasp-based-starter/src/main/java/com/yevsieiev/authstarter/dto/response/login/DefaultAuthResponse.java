@@ -5,9 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Базовая реализация AuthResponse
- */
 @Data
 @Builder
 @AllArgsConstructor

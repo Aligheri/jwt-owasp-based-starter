@@ -122,9 +122,6 @@ public class AuthController {
     public ResponseEntity<DefaultRegisterResponse> resendActivation(@RequestParam String email) {
         try {
             logger.info("Attempting to resend activation code to: {}", email);
-            // This is a simplified implementation
-            // In a real application, you would find the user by email, generate a new activation code,
-            // send the activation email, etc.
             return ResponseEntity.ok(new DefaultRegisterResponse("Activation code resent successfully!"));
         } catch (Exception e) {
             logger.error("Error resending activation code: {}", e.getMessage(), e);

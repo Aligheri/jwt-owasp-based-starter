@@ -76,13 +76,13 @@ public abstract class DefaultAuthenticationService <
         }
     }
 
-    // ❗ Реализация регистрации должна остаться конкретной — это бизнес-логика
+
     @Override
     public V registerUser(U registrationRequest) {
         throw new UnsupportedOperationException("registerUser must be overridden in subclass");
     }
 
-    // ✅ Logout по умолчанию
+
     @Override
     public V logout(String jwtToken, HttpServletResponse response, String cookieName) {
         try {
@@ -101,7 +101,7 @@ public abstract class DefaultAuthenticationService <
         }
     }
 
-    // (опционально) метод активации
+
     public void activateAccount(String token) {
         logger.info("Activating account with token: {}", token);
     }

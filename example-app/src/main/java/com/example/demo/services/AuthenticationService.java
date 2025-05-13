@@ -54,8 +54,8 @@ public class AuthenticationService extends DefaultAuthenticationService<
                 jwtUtils,
                 tokenCipher,
                 tokenRevoker,
-                DefaultAuthResponse::new,         // <- Supplier
-                DefaultRegisterResponse::new      // <- Supplier
+                DefaultAuthResponse::new,
+                DefaultRegisterResponse::new
         );
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
