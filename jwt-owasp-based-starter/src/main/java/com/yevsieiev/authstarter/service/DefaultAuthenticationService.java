@@ -1,7 +1,9 @@
 package com.yevsieiev.authstarter.service;
 
-import com.yevsieiev.authstarter.auth.*;
-import com.yevsieiev.authstarter.dto.MessageResponse;
+import com.yevsieiev.authstarter.dto.response.login.DefaultAuthResponse;
+import com.yevsieiev.authstarter.dto.request.login.DefaultAuthRequest;
+import com.yevsieiev.authstarter.dto.response.register.DefaultRegisterResponse;
+import com.yevsieiev.authstarter.dto.request.register.DefaultRegistrationRequest;
 import com.yevsieiev.authstarter.jwt.JwtUtils;
 import com.yevsieiev.authstarter.jwt.TokenCipher;
 import com.yevsieiev.authstarter.jwt.TokenRevoker;
@@ -28,10 +30,10 @@ public abstract class DefaultAuthenticationService implements AuthenticationServ
     private final TokenCipher tokenCipher;
     private final TokenRevoker tokenRevoker;
 
-    @Override
-    public abstract MessageResponse registerUser(RegistrationRequest registrationRequest);
 
-    public DefaultAuthResponse authenticateUser(DefaultLoginRequest loginRequest, HttpServletResponse response, String issuerId) {
+    public abstract DefaultRegisterResponse registerUser(DefaultRegistrationRequest defaultRegistrationRequest);
+
+    public DefaultAuthResponse authenticateUser(DefaultAuthRequest loginRequest, HttpServletResponse response, String issuerId) {
         try {
             // Authenticate the user
             Authentication authentication = authenticationManager.authenticate(
@@ -63,7 +65,7 @@ public abstract class DefaultAuthenticationService implements AuthenticationServ
             return DefaultAuthResponse.builder()
                     .accessToken(cipheredJwt)
                     .tokenType("Bearer")
-                    .expiresIn(3600) // 1 hour
+                    .expiresIn(3600L) // 1 hour
                     .build();
         } catch (Exception e) {
             logger.error("Error during authentication", e);
@@ -72,16 +74,16 @@ public abstract class DefaultAuthenticationService implements AuthenticationServ
     }
 
     @Override
-    public MessageResponse logout(String jwtToken, HttpServletResponse response, String cookieName) {
+    public DefaultRegisterResponse logout(String jwtToken, HttpServletResponse response, String cookieName) {
         try {
             // Delete the cookie
             jwtUtils.deleteCookie(response, cookieName);
             // Revoke the token
             tokenRevoker.revokeToken(jwtToken);
-            return new MessageResponse("Logged out successfully!");
+            return new DefaultRegisterResponse("Logged out successfully!");
         } catch (Exception e) {
             logger.error("Error during logout", e);
-            return new MessageResponse("Error during logout: " + e.getMessage());
+            return new DefaultRegisterResponse("Error during logout: " + e.getMessage());
         }
     }
 

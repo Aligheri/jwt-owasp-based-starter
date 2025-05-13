@@ -7,16 +7,13 @@ import com.example.demo.entities.User;
 import com.example.demo.entities.UserStatus;
 import com.example.demo.repositories.TokenRepository;
 import com.example.demo.repositories.UserRepository;
-import com.yevsieiev.authstarter.auth.AuthRequest;
-import com.yevsieiev.authstarter.auth.DefaultAuthResponse;
-import com.yevsieiev.authstarter.auth.RegistrationRequest;
-import com.yevsieiev.authstarter.dto.MessageResponse;
+import com.yevsieiev.authstarter.dto.request.register.DefaultRegistrationRequest;
+import com.yevsieiev.authstarter.dto.response.register.DefaultRegisterResponse;
 import com.yevsieiev.authstarter.jwt.JwtUtils;
 import com.yevsieiev.authstarter.jwt.TokenCipher;
 import com.yevsieiev.authstarter.jwt.TokenRevoker;
 import com.yevsieiev.authstarter.service.DefaultAuthenticationService;
 import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,13 +41,13 @@ public class AuthenticationService extends DefaultAuthenticationService {
     }
 
     @Override
-    public MessageResponse registerUser(RegistrationRequest request) {
+    public DefaultRegisterResponse registerUser(DefaultRegistrationRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            return new MessageResponse("Error: Username is already taken!");
+            return new DefaultRegisterResponse("Error: Username is already taken!");
         }
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            return new MessageResponse("Error: Email is already in use!");
+            return new DefaultRegisterResponse("Error: Email is already in use!");
         }
 
         User user = new User();
@@ -64,7 +61,7 @@ public class AuthenticationService extends DefaultAuthenticationService {
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
-        return new MessageResponse("User registered successfully!");
+        return new DefaultRegisterResponse("User registered successfully!");
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.yevsieiev.authstarter.auth;
+package com.yevsieiev.authstarter.dto.request.register;
 
 import lombok.Data;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @Data
 @NoArgsConstructor
-public class RegistrationRequest {
+public class DefaultRegistrationRequest implements RegisterRequest {
     private String username;
     private String password;
     private String email;

@@ -1,7 +1,9 @@
 package com.yevsieiev.authstarter.service;
 
-import com.yevsieiev.authstarter.auth.*;
-import com.yevsieiev.authstarter.dto.MessageResponse;
+import com.yevsieiev.authstarter.dto.response.login.DefaultAuthResponse;
+import com.yevsieiev.authstarter.dto.request.login.DefaultAuthRequest;
+import com.yevsieiev.authstarter.dto.response.register.DefaultRegisterResponse;
+import com.yevsieiev.authstarter.dto.request.register.DefaultRegistrationRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
@@ -12,10 +14,10 @@ public interface AuthenticationService {
     /**
      * Register a new user
      *
-     * @param registrationRequest the registration request
+     * @param defaultRegistrationRequest the registration request
      * @return a message response indicating success or failure
      */
-    MessageResponse registerUser(RegistrationRequest registrationRequest);
+    DefaultRegisterResponse registerUser(DefaultRegistrationRequest defaultRegistrationRequest);
     
     /**
      * Authenticate a user
@@ -25,7 +27,7 @@ public interface AuthenticationService {
      * @param issuerId the issuer ID for the JWT
      * @return an authentication response containing the JWT token and user details
      */
-    DefaultAuthResponse authenticateUser(DefaultLoginRequest loginRequest, HttpServletResponse response, String issuerId);
+    DefaultAuthResponse authenticateUser(DefaultAuthRequest loginRequest, HttpServletResponse response, String issuerId);
     
     /**
      * Logout a user
@@ -35,7 +37,7 @@ public interface AuthenticationService {
      * @param cookieName the name of the cookie to delete
      * @return a message response indicating success or failure
      */
-    MessageResponse logout(String jwtToken, HttpServletResponse response, String cookieName);
+    DefaultRegisterResponse logout(String jwtToken, HttpServletResponse response, String cookieName);
     
 
 }

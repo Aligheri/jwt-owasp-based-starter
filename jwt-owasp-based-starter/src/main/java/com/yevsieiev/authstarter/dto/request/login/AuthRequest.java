@@ -1,4 +1,4 @@
-package com.yevsieiev.authstarter.auth;
+package com.yevsieiev.authstarter.dto.request.login;
 
 /**
  * Базовый интерфейс для запроса аутентификации

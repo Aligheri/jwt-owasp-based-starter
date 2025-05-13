@@ -1,4 +1,4 @@
-package com.yevsieiev.authstarter.auth;
+package com.yevsieiev.authstarter.dto.response.login;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,5 +15,5 @@ import lombok.NoArgsConstructor;
 public class DefaultAuthResponse implements AuthResponse {
     private String accessToken;
     private String tokenType = "Bearer";
-    private long expiresIn;
+    private Long expiresIn;
 }

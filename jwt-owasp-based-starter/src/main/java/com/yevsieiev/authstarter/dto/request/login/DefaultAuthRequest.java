@@ -1,4 +1,4 @@
-package com.yevsieiev.authstarter.auth;
+package com.yevsieiev.authstarter.dto.request.login;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DefaultLoginRequest implements AuthRequest {
+public class DefaultAuthRequest implements AuthRequest {
     @NotBlank
     @Size(min = 3, max = 50)
     private String username;

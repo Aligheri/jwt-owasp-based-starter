@@ -1,10 +1,11 @@
-package com.yevsieiev.authstarter.auth;
+package com.yevsieiev.authstarter.dto.response.login;
+
+import java.time.Instant;
 
 /**
  * Интерфейс для ответа аутентификации
  */
 public interface AuthResponse {
     String getAccessToken();
-    String getTokenType();
-    long getExpiresIn();
+    Long getExpiresIn();
 }

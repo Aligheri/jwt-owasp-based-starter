@@ -1,11 +1,10 @@
 package com.yevsieiev.authstarter.controller;
 
-import com.yevsieiev.authstarter.auth.AuthRequest;
-import com.yevsieiev.authstarter.auth.AuthResponse;
-import com.yevsieiev.authstarter.auth.DefaultLoginRequest;
-import com.yevsieiev.authstarter.auth.RegistrationRequest;
+import com.yevsieiev.authstarter.dto.response.login.AuthResponse;
+import com.yevsieiev.authstarter.dto.request.login.DefaultAuthRequest;
+import com.yevsieiev.authstarter.dto.request.register.DefaultRegistrationRequest;
 import com.yevsieiev.authstarter.config.ValidationProperties;
-import com.yevsieiev.authstarter.dto.MessageResponse;
+import com.yevsieiev.authstarter.dto.response.register.DefaultRegisterResponse;
 import com.yevsieiev.authstarter.service.DefaultAuthenticationService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -40,15 +39,15 @@ public class AuthenticationController {
      * @return a response entity with a message
      */
     @PostMapping("/register")
-    public ResponseEntity<MessageResponse> registerUser(@Valid @RequestBody RegistrationRequest registrationRequest) {
+    public ResponseEntity<DefaultRegisterResponse> registerUser(@Valid @RequestBody DefaultRegistrationRequest registrationRequest) {
         logger.info("Attempting to register user: {}", registrationRequest.getUsername());
-        MessageResponse messageResponse = authenticationService.registerUser(registrationRequest);
-        if (messageResponse.getMessage().startsWith("Error:")) {
-            logger.warn("Registration error: {}", messageResponse.getMessage());
-            return ResponseEntity.badRequest().body(messageResponse);
+        DefaultRegisterResponse defaultRegisterResponse = authenticationService.registerUser(registrationRequest);
+        if (defaultRegisterResponse.getMessage().startsWith("Error:")) {
+            logger.warn("Registration error: {}", defaultRegisterResponse.getMessage());
+            return ResponseEntity.badRequest().body(defaultRegisterResponse);
         } else {
             logger.info("User registered successfully: {}", registrationRequest.getUsername());
-            return ResponseEntity.ok(messageResponse);
+            return ResponseEntity.ok(defaultRegisterResponse);
         }
     }
 
@@ -60,7 +59,7 @@ public class AuthenticationController {
      * @return a response entity with an authentication response
      */
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> loginUser(@Valid @RequestBody DefaultLoginRequest loginRequest, HttpServletResponse response) {
+    public ResponseEntity<AuthResponse> loginUser(@Valid @RequestBody DefaultAuthRequest loginRequest, HttpServletResponse response) {
         logger.info("Attempting to authenticate user: {}", loginRequest.getUsername());
         return ResponseEntity.ok(authenticationService.authenticateUser(loginRequest, response, validationProperties.getIssuerId()));
     }
@@ -73,7 +72,7 @@ public class AuthenticationController {
      * @return a message response
      */
     @PostMapping("/logout")
-    public ResponseEntity<MessageResponse> logout(@RequestHeader("Authorization") String jwt, HttpServletResponse response) {
+    public ResponseEntity<DefaultRegisterResponse> logout(@RequestHeader("Authorization") String jwt, HttpServletResponse response) {
         if (jwt != null && !jwt.isEmpty()) {
             if (jwt.startsWith("Bearer ")) {
                 jwt = jwt.substring(7);
@@ -81,17 +80,17 @@ public class AuthenticationController {
             logger.debug("Token received for logout: {}", jwt);
 
             try {
-                MessageResponse messageResponse = authenticationService.logout(jwt, response, "fingerprint");
-                return ResponseEntity.ok(messageResponse);
+                DefaultRegisterResponse defaultRegisterResponse = authenticationService.logout(jwt, response, "fingerprint");
+                return ResponseEntity.ok(defaultRegisterResponse);
             } catch (IllegalArgumentException e) {
                 logger.error("Base64 decoding error in logout method: {}", e.getMessage(), e);
-                return ResponseEntity.badRequest().body(new MessageResponse("Error during logout: Invalid token format"));
+                return ResponseEntity.badRequest().body(new DefaultRegisterResponse("Error during logout: Invalid token format"));
             } catch (Exception e) {
                 logger.error("Error in logout method: {}", e.getMessage(), e);
-                return ResponseEntity.badRequest().body(new MessageResponse("Error during logout: " + e.getMessage()));
+                return ResponseEntity.badRequest().body(new DefaultRegisterResponse("Error during logout: " + e.getMessage()));
             }
         } else {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error in logout method: Authorization header is missing or empty"));
+            return ResponseEntity.badRequest().body(new DefaultRegisterResponse("Error in logout method: Authorization header is missing or empty"));
         }
     }
 
@@ -120,14 +119,14 @@ public class AuthenticationController {
      * @return a response entity with a message
      */
     @PostMapping("/resend-activation")
-    public ResponseEntity<MessageResponse> resendActivation(@RequestParam String email) {
+    public ResponseEntity<DefaultRegisterResponse> resendActivation(@RequestParam String email) {
         try {
             logger.info("Attempting to resend activation code to: {}", email);
-            MessageResponse response = null;
+            DefaultRegisterResponse response = null;
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("Error resending activation code: {}", e.getMessage(), e);
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: " + e.getMessage()));
+            return ResponseEntity.badRequest().body(new DefaultRegisterResponse("Error: " + e.getMessage()));
         }
     }
 }
