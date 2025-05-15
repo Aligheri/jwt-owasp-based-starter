@@ -10,11 +10,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
 @ComponentScan(
-        basePackages = {"com.example.demo", "com.yevsieiev.authstarter"},
-        excludeFilters = {
-                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
-                        classes = com.yevsieiev.authstarter.controller.AuthenticationController.class)
-        }
+        basePackages = {"com.example.demo", "com.yevsieiev.authstarter"}
+
 )
 @EnableJpaRepositories(basePackages = {"com.example.demo.repositories"})
 @EntityScan(basePackages = {"com.example.demo.entities"})

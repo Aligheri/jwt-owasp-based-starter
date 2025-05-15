@@ -1,8 +1,8 @@
 package com.yevsieiev.authstarter.config;
 
-import com.yevsieiev.authstarter.jwt.AuthEntryPointJwt;
+import com.yevsieiev.authstarter.utils.AuthEntryPointJwt;
 import com.yevsieiev.authstarter.jwt.JwtAuthenticationFilter;
-import com.yevsieiev.authstarter.jwt.JwtUtils;
+import com.yevsieiev.authstarter.utils.JwtUtils;
 import com.yevsieiev.authstarter.jwt.TokenCipher;
 import com.yevsieiev.authstarter.jwt.TokenRevoker;
 import com.yevsieiev.authstarter.repository.RevokedTokenRepository;
@@ -24,6 +24,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 /**
@@ -70,7 +71,7 @@ public class AuthAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public TokenCipher tokenCipher() throws GeneralSecurityException {
+    public TokenCipher tokenCipher() throws GeneralSecurityException, IOException {
         return new TokenCipher();
     }
 

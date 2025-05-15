@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@PropertySource("classpath:application.yml")
+@PropertySource("classpath:application.properties")
 public class AuthController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);

@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
 
-import com.yevsieiev.authstarter.jwt.JwtUtils;
+import com.yevsieiev.authstarter.utils.JwtUtils;
 import com.yevsieiev.authstarter.jwt.TokenCipher;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;

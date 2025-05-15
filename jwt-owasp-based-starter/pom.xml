@@ -61,10 +61,11 @@
             <version>3.18.2</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.google.crypto.tink/tink -->
         <dependency>
             <groupId>com.google.crypto.tink</groupId>
             <artifactId>tink</artifactId>
-            <version>1.13.0</version>
+            <version>1.17.0</version>
         </dependency>
 
         <dependency>

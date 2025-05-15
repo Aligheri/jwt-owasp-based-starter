@@ -4,7 +4,7 @@ import com.yevsieiev.authstarter.dto.request.login.AuthRequest;
 import com.yevsieiev.authstarter.dto.request.register.RegisterRequest;
 import com.yevsieiev.authstarter.dto.response.login.AuthResponse;
 import com.yevsieiev.authstarter.dto.response.register.RegisterResponse;
-import com.yevsieiev.authstarter.jwt.JwtUtils;
+import com.yevsieiev.authstarter.utils.JwtUtils;
 import com.yevsieiev.authstarter.jwt.TokenCipher;
 import com.yevsieiev.authstarter.jwt.TokenRevoker;
 import jakarta.servlet.http.HttpServletResponse;

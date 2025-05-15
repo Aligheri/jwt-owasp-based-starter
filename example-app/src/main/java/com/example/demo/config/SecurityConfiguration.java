@@ -1,6 +1,6 @@
 package com.example.demo.config;
 
-import com.yevsieiev.authstarter.jwt.AuthEntryPointJwt;
+import com.yevsieiev.authstarter.utils.AuthEntryPointJwt;
 import com.yevsieiev.authstarter.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

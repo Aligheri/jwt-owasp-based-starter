@@ -11,7 +11,7 @@ import com.yevsieiev.authstarter.dto.request.login.DefaultAuthRequest;
 import com.yevsieiev.authstarter.dto.request.register.DefaultRegistrationRequest;
 import com.yevsieiev.authstarter.dto.response.login.DefaultAuthResponse;
 import com.yevsieiev.authstarter.dto.response.register.DefaultRegisterResponse;
-import com.yevsieiev.authstarter.jwt.JwtUtils;
+import com.yevsieiev.authstarter.utils.JwtUtils;
 import com.yevsieiev.authstarter.jwt.TokenCipher;
 import com.yevsieiev.authstarter.jwt.TokenRevoker;
 import com.yevsieiev.authstarter.service.DefaultAuthenticationService;
@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.function.Supplier;
 
 @Service
 public class AuthenticationService extends DefaultAuthenticationService<

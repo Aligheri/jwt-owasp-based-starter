@@ -42,10 +42,8 @@
         document.getElementById('cookie-status').textContent = 
             hasFingerprintCookie() ? "Cookie still exists (not properly removed)" : "Successfully removed";
 
-        // Clear any remaining token just to be safe
         removeToken();
 
-        // Redirect to login after 5 seconds
         setTimeout(function() {
             window.location.href = '/login';
         }, 5000);
