@@ -79,7 +79,7 @@ public class TokenCipher {
                 ChronoUnit.MINUTES
         );
 
-        long periodMinutes = 30 * 24 * 60; // 30 дней в минутах
+        long periodMinutes = 30 * 24 * 60;
 
         scheduler.scheduleAtFixedRate(
                 this::rotateKey,

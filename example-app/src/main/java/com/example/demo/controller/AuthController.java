@@ -42,13 +42,8 @@ public class AuthController {
     public ResponseEntity<DefaultRegisterResponse> registerUser(@Valid @RequestBody DefaultRegistrationRequest defaultRegistrationRequest) {
         logger.info("Attempting to register user: {}", defaultRegistrationRequest.getUsername());
         DefaultRegisterResponse defaultRegisterResponse = authenticationService.registerUser(defaultRegistrationRequest);
-        if (defaultRegisterResponse.getMessage().startsWith("Error:")) {
-            logger.warn("Registration error: {}", defaultRegisterResponse.getMessage());
-            return ResponseEntity.badRequest().body(defaultRegisterResponse);
-        } else {
-            logger.info("User registered successfully: {}", defaultRegistrationRequest.getUsername());
-            return ResponseEntity.ok(defaultRegisterResponse);
-        }
+        logger.info("User registered successfully: {}", defaultRegistrationRequest.getUsername());
+        return ResponseEntity.ok(defaultRegisterResponse);
     }
 
     /**
