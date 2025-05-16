@@ -1,5 +1,6 @@
 package com.yevsieiev.authstarter.config;
 
+import com.yevsieiev.authstarter.exceptions.RegisterException;
 import com.yevsieiev.authstarter.utils.AuthEntryPointJwt;
 import com.yevsieiev.authstarter.jwt.JwtAuthenticationFilter;
 import com.yevsieiev.authstarter.utils.JwtUtils;
@@ -93,5 +94,11 @@ public class AuthAutoConfiguration {
     @ConditionalOnBean({UserDetailsService.class, JwtUtils.class})
     public JwtAuthenticationFilter jwtAuthenticationFilter(JwtUtils jwtUtils, UserDetailsService userDetailsService) {
         return new JwtAuthenticationFilter(jwtUtils, userDetailsService);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public RegisterException registerException() {
+        return new RegisterException(String.format("Register Exception: %s", "%s"));
     }
 }
