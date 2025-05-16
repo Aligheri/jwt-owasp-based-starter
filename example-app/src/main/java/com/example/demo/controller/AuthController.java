@@ -6,6 +6,7 @@ import com.yevsieiev.authstarter.dto.request.login.DefaultAuthRequest;
 import com.yevsieiev.authstarter.dto.response.register.DefaultRegisterResponse;
 
 import com.yevsieiev.authstarter.dto.request.register.DefaultRegistrationRequest;
+import com.yevsieiev.authstarter.exceptions.RegisterException;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -41,9 +42,13 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<DefaultRegisterResponse> registerUser(@Valid @RequestBody DefaultRegistrationRequest defaultRegistrationRequest) {
         logger.info("Attempting to register user: {}", defaultRegistrationRequest.getUsername());
-        DefaultRegisterResponse defaultRegisterResponse = authenticationService.registerUser(defaultRegistrationRequest);
-        logger.info("User registered successfully: {}", defaultRegistrationRequest.getUsername());
-        return ResponseEntity.ok(defaultRegisterResponse);
+        try{
+            DefaultRegisterResponse defaultRegisterResponse = authenticationService.registerUser(defaultRegistrationRequest);
+            logger.info("User registered successfully: {}", defaultRegistrationRequest.getUsername());
+            return ResponseEntity.ok(defaultRegisterResponse);
+        }catch (RegisterException e){
+            return ResponseEntity.badRequest().body(new DefaultRegisterResponse(e.getMessage()));
+        }
     }
 
     /**
