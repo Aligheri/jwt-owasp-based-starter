@@ -36,14 +36,14 @@ function register(username, email, password) {
             password: password
         })
     })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(data => {
-                throw new Error(data.message || 'Registration failed');
-            });
-        }
-        return response.json();
-    });
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.message || 'Registration failed');
+                });
+            }
+            return response.json();
+        });
 }
 
 // Function to handle login
@@ -58,17 +58,17 @@ function login(username, password) {
             password: password
         })
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Login failed');
-        }
-        return response.json();
-    })
-    .then(data => {
-        setToken(data.token);
-        console.log(data);
-        return data;
-    });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Login failed');
+            }
+            return response.json();
+        })
+        .then(data => {
+            setToken(data.token);
+            console.log(data);
+            return data;
+        });
 }
 
 // Function to handle logout
@@ -85,10 +85,10 @@ function logout() {
             'Authorization': 'Bearer ' + token
         }
     })
-    .then(response => {
-        removeToken();
-        return response;
-    });
+        .then(response => {
+            removeToken();
+            return response;
+        });
 }
 
 
