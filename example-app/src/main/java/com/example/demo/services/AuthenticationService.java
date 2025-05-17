@@ -16,6 +16,7 @@ import com.yevsieiev.authstarter.jwt.TokenCipher;
 import com.yevsieiev.authstarter.jwt.TokenRevoker;
 import com.yevsieiev.authstarter.service.DefaultAuthenticationService;
 import jakarta.mail.MessagingException;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,7 +47,9 @@ public class AuthenticationService extends DefaultAuthenticationService<
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             TokenRepository tokenRepository,
-            EmailService emailService
+            EmailService emailService,
+            ApplicationEventPublisher eventPublisher
+
     ) {
         super(
                 authenticationManager,
@@ -54,7 +57,9 @@ public class AuthenticationService extends DefaultAuthenticationService<
                 tokenCipher,
                 tokenRevoker,
                 DefaultAuthResponse::new,
-                DefaultRegisterResponse::new
+                DefaultRegisterResponse::new,
+                eventPublisher
+
         );
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
