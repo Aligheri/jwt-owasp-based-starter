@@ -1,6 +1,7 @@
 package com.yevsieiev.authstarter.config;
 
 import com.yevsieiev.authstarter.event.AuthEventHandler;
+import com.yevsieiev.authstarter.event.service.LoginMetricsCounter;
 import com.yevsieiev.authstarter.exceptions.RegisterException;
 import com.yevsieiev.authstarter.utils.AuthEntryPointJwt;
 import com.yevsieiev.authstarter.jwt.JwtAuthenticationFilter;
@@ -33,13 +34,12 @@ import java.security.GeneralSecurityException;
  * Auto-configuration for JWT authentication.
  */
 @AutoConfiguration
-@ConditionalOnClass({ EnableWebSecurity.class })
+@ConditionalOnClass({EnableWebSecurity.class})
 @ConditionalOnProperty(name = "jwt.auth.enabled", havingValue = "true", matchIfMissing = true)
 @EnableJpaRepositories(basePackages = "com.yevsieiev.authstarter.repository")
 @EntityScan(basePackages = "com.yevsieiev.authstarter.entity")
 @EnableConfigurationProperties(ValidationProperties.class)
 public class AuthAutoConfiguration {
-
 
 
     @Bean
@@ -86,7 +86,7 @@ public class AuthAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnBean(TokenRevoker.class)
-    public JwtUtils jwtUtils(ValidationProperties validationProperties ,TokenCipher tokenCipher, TokenRevoker tokenRevoker ) {
+    public JwtUtils jwtUtils(ValidationProperties validationProperties, TokenCipher tokenCipher, TokenRevoker tokenRevoker) {
         return new JwtUtils(validationProperties, tokenCipher, tokenRevoker);
     }
 
@@ -102,10 +102,11 @@ public class AuthAutoConfiguration {
     public RegisterException registerException() {
         return new RegisterException(String.format("Register Exception: %s", "%s"));
     }
+
     @Bean
     @ConditionalOnMissingBean
-    public AuthEventHandler authEventHandler() {
-        return new AuthEventHandler();
+    public AuthEventHandler authEventHandler(LoginMetricsCounter loginMetricsCounter) {
+        return new AuthEventHandler(loginMetricsCounter);
 
     }
 }
