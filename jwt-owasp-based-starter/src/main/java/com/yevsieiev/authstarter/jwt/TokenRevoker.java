@@ -71,7 +71,7 @@ public class TokenRevoker {
         }
     }
 
-    private void scheduleRevokedTokensDeletion() {
+    protected void scheduleRevokedTokensDeletion() {
         long initialDelay = LocalDateTime.now().until(
                 LocalDateTime.now().plusDays(30).withHour(3).withMinute(0),
                 ChronoUnit.MINUTES
