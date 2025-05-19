@@ -1,0 +1,15 @@
+{
+  "primaryKeyId": 3096292842,
+  "key": [
+    {
+      "keyData": {
+        "typeUrl": "type.googleapis.com/google.crypto.tink.AesGcmKey",
+        "value": "GiBLhbUVKyQpThQMUvN46tEdET8Wofk60YatxZPxlKP72A==",
+        "keyMaterialType": "SYMMETRIC"
+      },
+      "status": "ENABLED",
+      "keyId": 3096292842,
+      "outputPrefixType": "TINK"
+    }
+  ]
+}
