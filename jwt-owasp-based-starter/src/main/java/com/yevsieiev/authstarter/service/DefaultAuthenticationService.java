@@ -5,6 +5,9 @@ import com.yevsieiev.authstarter.dto.request.register.RegisterRequest;
 import com.yevsieiev.authstarter.dto.response.login.AuthResponse;
 import com.yevsieiev.authstarter.dto.response.register.RegisterResponse;
 import com.yevsieiev.authstarter.event.AuthSuccessEvent;
+import com.yevsieiev.authstarter.utils.CookieUtils;
+import com.yevsieiev.authstarter.utils.FingerprintUtils;
+import com.yevsieiev.authstarter.utils.JwtTokenProvider;
 import com.yevsieiev.authstarter.utils.JwtUtils;
 import com.yevsieiev.authstarter.jwt.TokenCipher;
 import com.yevsieiev.authstarter.jwt.TokenRevoker;
@@ -35,11 +38,12 @@ public abstract class DefaultAuthenticationService<
     private static final Logger logger = LoggerFactory.getLogger(DefaultAuthenticationService.class);
 
     private final AuthenticationManager authenticationManager;
-    private final JwtUtils jwtUtils;
     private final TokenCipher tokenCipher;
     private final TokenRevoker tokenRevoker;
     private final Supplier<R> authResponseSupplier;
     private final Supplier<V> registerResponseSupplier;
+    private final CookieUtils cookieUtils;
+    private final JwtTokenProvider jwtTokenProvider;
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
@@ -54,17 +58,14 @@ public abstract class DefaultAuthenticationService<
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            String userFingerprint = jwtUtils.createUserFingerprint();
-            logger.debug("Generated userFingerprint: {}", userFingerprint);
+            String fingerprint = FingerprintUtils.generateFingerprint();
+            logger.debug("Generated fingerprint: {}", fingerprint);
+            cookieUtils.setFingerprintCookie(response, fingerprint);
 
-            jwtUtils.createCookie(response, "fingerprint", userFingerprint, 24 * 60 * 60, true);
+            String fingerprintHash = FingerprintUtils.hashFingerprint(fingerprint);
+            logger.debug("Generated fingerprint hash: {}", fingerprintHash);
 
-            String userFingerprintHash = jwtUtils.hashFingerprint(userFingerprint);
-            logger.debug("Generated userFingerprintHash: {}", userFingerprintHash);
-
-            String jwt = jwtUtils.generateAccessTokenFromUsername(
-                    loginRequest.getIdentifier(), issuerId, userFingerprintHash
-            );
+            String jwt = jwtTokenProvider.generateToken(loginRequest.getIdentifier(), fingerprintHash);
 
             String cipheredJwt = tokenCipher.cipherToken(jwt);
             logger.debug("Generated ciphered token: {}", cipheredJwt);
@@ -94,7 +95,7 @@ public abstract class DefaultAuthenticationService<
     @Override
     public V logout(String jwtToken, HttpServletResponse response, String cookieName) {
         try {
-            jwtUtils.deleteCookie(response, cookieName);
+            cookieUtils.deleteCookie(response, cookieName);
             tokenRevoker.revokeToken(jwtToken);
 
             V registerResponse = registerResponseSupplier.get();

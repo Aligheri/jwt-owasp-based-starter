@@ -1,18 +1,10 @@
 package com.example.demo.controller;
 
 
-import com.yevsieiev.authstarter.utils.JwtUtils;
-import com.yevsieiev.authstarter.jwt.TokenCipher;
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import java.security.GeneralSecurityException;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,17 +17,6 @@ import java.util.Map;
 @Controller
 public class WebController {
 
-    private final JwtUtils jwtUtils;
-    private final TokenCipher tokenCipher;
-
-    @Value("${auth.validation.issuer-id}")
-    private String issuerId;
-
-    @Autowired
-    public WebController(JwtUtils jwtUtils, TokenCipher tokenCipher) {
-        this.jwtUtils = jwtUtils;
-        this.tokenCipher = tokenCipher;
-    }
 
     /**
      * Home page
@@ -72,35 +53,13 @@ public class WebController {
      * OAuth 2
      */
     @GetMapping("/user")
-    public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal, HttpServletResponse response) {
+    public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
         if (principal == null) {
             return Collections.singletonMap("authenticated", false);
         }
-
-        try {
-
-            String userFingerprint = jwtUtils.createUserFingerprint();
-            jwtUtils.createCookie(response, "fingerprint", userFingerprint, 24 * 60 * 60, true);
-
-            String userFingerprintHash = jwtUtils.hashFingerprint(userFingerprint);
-
-            String username = principal.getAttribute("login");
-            if (username == null) {
-                username = principal.getAttribute("name");
-            }
-
-            String jwt = jwtUtils.generateAccessTokenFromUsername(username, issuerId, userFingerprintHash);
-
-            String cipheredJwt = tokenCipher.cipherToken(jwt);
-
             Map<String, Object> result = new HashMap<>();
             result.put("name", principal.getAttribute("name"));
-            result.put("token", cipheredJwt);
-
             return result;
-        } catch (GeneralSecurityException e) {
-            return Collections.singletonMap("error", "Authentication failed: " + e.getMessage());
-        }
     }
     /**
      * Dashboard page - displays the JWT token and fingerprint cookie

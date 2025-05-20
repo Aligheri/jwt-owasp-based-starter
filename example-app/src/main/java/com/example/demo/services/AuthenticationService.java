@@ -11,7 +11,8 @@ import com.yevsieiev.authstarter.dto.request.login.DefaultAuthRequest;
 import com.yevsieiev.authstarter.dto.request.register.DefaultRegistrationRequest;
 import com.yevsieiev.authstarter.dto.response.login.DefaultAuthResponse;
 import com.yevsieiev.authstarter.dto.response.register.DefaultRegisterResponse;
-import com.yevsieiev.authstarter.utils.JwtUtils;
+import com.yevsieiev.authstarter.utils.CookieUtils;
+import com.yevsieiev.authstarter.utils.JwtTokenProvider;
 import com.yevsieiev.authstarter.jwt.TokenCipher;
 import com.yevsieiev.authstarter.jwt.TokenRevoker;
 import com.yevsieiev.authstarter.service.DefaultAuthenticationService;
@@ -30,7 +31,7 @@ public class AuthenticationService extends DefaultAuthenticationService<
         DefaultAuthRequest,
         DefaultAuthResponse,
         DefaultRegistrationRequest,
-        DefaultRegisterResponse>  {
+        DefaultRegisterResponse> {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -41,25 +42,25 @@ public class AuthenticationService extends DefaultAuthenticationService<
 
     public AuthenticationService(
             AuthenticationManager authenticationManager,
-            JwtUtils jwtUtils,
+            JwtTokenProvider jwtTokenProvider,
             TokenCipher tokenCipher,
             TokenRevoker tokenRevoker,
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             TokenRepository tokenRepository,
             EmailService emailService,
-            ApplicationEventPublisher eventPublisher
-
+            ApplicationEventPublisher eventPublisher,
+            CookieUtils cookieUtils
     ) {
         super(
                 authenticationManager,
-                jwtUtils,
                 tokenCipher,
                 tokenRevoker,
                 DefaultAuthResponse::new,
                 DefaultRegisterResponse::new,
+                cookieUtils,
+                jwtTokenProvider,
                 eventPublisher
-
         );
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;

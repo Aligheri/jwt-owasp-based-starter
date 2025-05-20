@@ -1,11 +1,11 @@
 package com.yevsieiev.authstarter.config;
 
+import com.auth0.jwt.algorithms.Algorithm;
 import com.yevsieiev.authstarter.event.AuthEventHandler;
 import com.yevsieiev.authstarter.event.service.LoginMetricsCounter;
 import com.yevsieiev.authstarter.exceptions.RegisterException;
-import com.yevsieiev.authstarter.utils.AuthEntryPointJwt;
+import com.yevsieiev.authstarter.utils.*;
 import com.yevsieiev.authstarter.jwt.JwtAuthenticationFilter;
-import com.yevsieiev.authstarter.utils.JwtUtils;
 import com.yevsieiev.authstarter.jwt.TokenCipher;
 import com.yevsieiev.authstarter.jwt.TokenRevoker;
 import com.yevsieiev.authstarter.repository.RevokedTokenRepository;
@@ -38,7 +38,7 @@ import java.security.GeneralSecurityException;
 @ConditionalOnProperty(name = "jwt.auth.enabled", havingValue = "true", matchIfMissing = true)
 @EnableJpaRepositories(basePackages = "com.yevsieiev.authstarter.repository")
 @EntityScan(basePackages = "com.yevsieiev.authstarter.entity")
-@EnableConfigurationProperties(ValidationProperties.class)
+@EnableConfigurationProperties({ValidationProperties.class, JwtProperties.class})
 public class AuthAutoConfiguration {
 
 
@@ -85,16 +85,40 @@ public class AuthAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    @ConditionalOnBean(TokenRevoker.class)
-    public JwtUtils jwtUtils(ValidationProperties validationProperties, TokenCipher tokenCipher, TokenRevoker tokenRevoker) {
-        return new JwtUtils(validationProperties, tokenCipher, tokenRevoker);
+    public FingerprintUtils fingerprintUtils(CookieUtils cookieUtils) {
+        return new FingerprintUtils(cookieUtils);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    @ConditionalOnBean({UserDetailsService.class, JwtUtils.class})
-    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtUtils jwtUtils, UserDetailsService userDetailsService) {
-        return new JwtAuthenticationFilter(jwtUtils, userDetailsService);
+    public CookieUtils cookieUtils(JwtProperties jwtProperties) {
+        return new CookieUtils(jwtProperties);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public Algorithm jwtAlgorithm(JwtProperties jwtProperties) {
+        return Algorithm.HMAC256(jwtProperties.getSecretKey());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public JwtTokenProvider jwtTokenProvider(
+            JwtProperties jwtProperties,
+            TokenCipher tokenCipher,
+            TokenRevoker tokenRevoker,
+            FingerprintUtils fingerprintUtils,
+            Algorithm jwtAlgorithm
+    ) {
+        return new JwtTokenProvider(jwtProperties, tokenCipher, tokenRevoker, fingerprintUtils, jwtAlgorithm);
+    }
+
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean({UserDetailsService.class, JwtTokenProvider.class})
+    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService) {
+        return new JwtAuthenticationFilter(jwtTokenProvider, userDetailsService);
     }
 
     @Bean
