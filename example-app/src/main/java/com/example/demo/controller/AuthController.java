@@ -26,7 +26,7 @@ public class AuthController {
 
     private final AuthenticationService authenticationService;
 
-    @Value(value = "${auth.validation.issuer-id}")
+    @Value(value = "${auth.jwt.issuer-id}")
     private transient String issuerId;
 
     public AuthController(AuthenticationService authenticationService) {
