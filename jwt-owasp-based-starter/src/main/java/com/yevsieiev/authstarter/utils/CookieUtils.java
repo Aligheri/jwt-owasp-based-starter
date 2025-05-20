@@ -45,4 +45,16 @@ public class CookieUtils {
                 .flatMap(stream -> stream.filter(c -> name.equals(c.getName())).findFirst())
                 .map(Cookie::getValue);
     }
+
+    public void deleteCookie(HttpServletResponse response, String name) {
+        ResponseCookie cookie = ResponseCookie.from(name, "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Lax")
+                .build();
+        response.addHeader("Set-Cookie", cookie.toString());
+    }
+
 }
