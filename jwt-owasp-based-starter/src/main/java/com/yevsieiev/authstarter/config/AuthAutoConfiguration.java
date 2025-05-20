@@ -38,7 +38,7 @@ import java.security.GeneralSecurityException;
 @ConditionalOnProperty(name = "jwt.auth.enabled", havingValue = "true", matchIfMissing = true)
 @EnableJpaRepositories(basePackages = "com.yevsieiev.authstarter.repository")
 @EntityScan(basePackages = "com.yevsieiev.authstarter.entity")
-@EnableConfigurationProperties(ValidationProperties.class)
+@EnableConfigurationProperties({ValidationProperties.class, JwtProperties.class})
 public class AuthAutoConfiguration {
 
 
