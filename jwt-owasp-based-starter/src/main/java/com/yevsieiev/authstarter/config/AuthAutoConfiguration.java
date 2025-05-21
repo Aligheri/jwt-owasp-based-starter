@@ -1,6 +1,7 @@
 package com.yevsieiev.authstarter.config;
 
 import com.auth0.jwt.algorithms.Algorithm;
+import com.yevsieiev.authstarter.email.EmailConfig;
 import com.yevsieiev.authstarter.event.AuthEventHandler;
 import com.yevsieiev.authstarter.event.service.LoginMetricsCounter;
 import com.yevsieiev.authstarter.exceptions.RegisterException;
@@ -38,7 +39,7 @@ import java.security.GeneralSecurityException;
 @ConditionalOnProperty(name = "jwt.auth.enabled", havingValue = "true", matchIfMissing = true)
 @EnableJpaRepositories(basePackages = "com.yevsieiev.authstarter.repository")
 @EntityScan(basePackages = "com.yevsieiev.authstarter.entity")
-@EnableConfigurationProperties({ValidationProperties.class, JwtProperties.class})
+@EnableConfigurationProperties({ValidationProperties.class, JwtProperties.class, EmailConfig.class})
 public class AuthAutoConfiguration {
 
 
