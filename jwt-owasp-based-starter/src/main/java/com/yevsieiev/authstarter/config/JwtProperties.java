@@ -4,7 +4,10 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.time.Duration;
-
+/**
+ * Configuration properties for validation constraints.
+ * These properties can be overridden in application.properties or application.yml.
+ */
 @ConfigurationProperties(prefix = "auth.jwt")
 @Data
 public class JwtProperties {
