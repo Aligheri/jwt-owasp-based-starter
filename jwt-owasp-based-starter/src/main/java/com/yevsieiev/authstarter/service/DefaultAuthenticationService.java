@@ -8,7 +8,6 @@ import com.yevsieiev.authstarter.event.AuthSuccessEvent;
 import com.yevsieiev.authstarter.utils.CookieUtils;
 import com.yevsieiev.authstarter.utils.FingerprintUtils;
 import com.yevsieiev.authstarter.utils.JwtTokenProvider;
-import com.yevsieiev.authstarter.utils.JwtUtils;
 import com.yevsieiev.authstarter.jwt.TokenCipher;
 import com.yevsieiev.authstarter.jwt.TokenRevoker;
 import jakarta.servlet.http.HttpServletResponse;

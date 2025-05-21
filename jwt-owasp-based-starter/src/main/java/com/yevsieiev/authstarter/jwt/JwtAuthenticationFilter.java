@@ -1,8 +1,6 @@
 package com.yevsieiev.authstarter.jwt;
 
-import com.yevsieiev.authstarter.config.JwtProperties;
 import com.yevsieiev.authstarter.utils.JwtTokenProvider;
-import com.yevsieiev.authstarter.utils.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
