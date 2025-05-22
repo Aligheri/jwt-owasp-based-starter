@@ -43,7 +43,7 @@
                 <label for="activationCode">Activation Code:</label>
                 <input type="text" id="activationCode" name="activationCode" required>
             </div>
-            <button id="activateBtn" class="button">Activate Account</button>
+            <a th:href="@{${activationBaseUrl}(email=${email}, code=${code})}">Activate Account</a>
         </div>
 
         <div id="success-message" class="success-message" style="display: none;">

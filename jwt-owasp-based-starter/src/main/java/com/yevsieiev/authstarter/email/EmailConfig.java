@@ -2,6 +2,7 @@ package com.yevsieiev.authstarter.email;
 
 import lombok.Data;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -10,7 +11,10 @@ import java.util.Properties;
 
 @Data
 @ConfigurationProperties(prefix = "app.email")
+@ConditionalOnProperty(name = "app.email.enabled", havingValue = "true")
 public class EmailConfig {
+    private String activationBaseUrl ="http://localhost:8080/activate";
+    private String templateName = "activation-email";
     private boolean enabled;
     private String host;
     private int port;

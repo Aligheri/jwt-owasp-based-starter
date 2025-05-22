@@ -6,6 +6,7 @@ import com.yevsieiev.authstarter.dto.request.login.DefaultAuthRequest;
 import com.yevsieiev.authstarter.dto.response.register.DefaultRegisterResponse;
 
 import com.yevsieiev.authstarter.dto.request.register.DefaultRegistrationRequest;
+import com.yevsieiev.authstarter.exceptions.EmailException;
 import com.yevsieiev.authstarter.exceptions.RegisterException;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -14,7 +15,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
 @RestController
@@ -94,21 +97,23 @@ public class AuthController {
         }
     }
 
-    /**
-     * Activate a user account
-     *
-     * @param token the activation token
-     * @return a redirect URL
-     */
+
     @GetMapping("/activate-account")
-    public String activateAccount(@RequestParam("token") String token) {
+    public String activateAccount(
+            @RequestParam String email,
+            @RequestParam String code,
+            RedirectAttributes redirectAttributes
+    ) {
         try {
-            authenticationService.activateAccount(token);
+            authenticationService.activateAccount(email, code);
+            redirectAttributes.addFlashAttribute("message", "Account activated successfully!");
             return "redirect:/login";
-        } catch (Exception e) {
-            logger.error("Error during account activation: {}", e.getMessage(), e);
-            // Redirect back to activation page with error
-            return "redirect:/activate-account";
+        } catch (EmailException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/activation-error.html";
+        } catch (UsernameNotFoundException e) {
+            redirectAttributes.addFlashAttribute("error", "User not found");
+            return "redirect:/registration";
         }
     }
 

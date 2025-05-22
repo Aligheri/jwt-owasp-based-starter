@@ -1,6 +1,8 @@
 package com.yevsieiev.authstarter.config;
 
 import com.auth0.jwt.algorithms.Algorithm;
+import com.yevsieiev.authstarter.email.ActivationService;
+import com.yevsieiev.authstarter.email.DefaultActivationService;
 import com.yevsieiev.authstarter.email.EmailConfig;
 import com.yevsieiev.authstarter.event.AuthEventHandler;
 import com.yevsieiev.authstarter.event.service.LoginMetricsCounter;
@@ -19,6 +21,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -27,6 +30,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -39,7 +43,7 @@ import java.security.GeneralSecurityException;
 @ConditionalOnProperty(name = "jwt.auth.enabled", havingValue = "true", matchIfMissing = true)
 @EnableJpaRepositories(basePackages = "com.yevsieiev.authstarter.repository")
 @EntityScan(basePackages = "com.yevsieiev.authstarter.entity")
-@EnableConfigurationProperties({ValidationProperties.class, JwtProperties.class, EmailConfig.class})
+@EnableConfigurationProperties({JwtProperties.class})
 public class AuthAutoConfiguration {
 
 
@@ -113,7 +117,6 @@ public class AuthAutoConfiguration {
     ) {
         return new JwtTokenProvider(jwtProperties, tokenCipher, tokenRevoker, fingerprintUtils, jwtAlgorithm);
     }
-
 
     @Bean
     @ConditionalOnMissingBean
