@@ -108,10 +108,4 @@ public abstract class DefaultAuthenticationService<
             return registerResponse;
         }
     }
-
-
-    public void activateAccount(String token) {
-        // TODO
-        logger.info("Activating account with token: {}", token);
-    }
 }
