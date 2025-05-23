@@ -1,6 +1,7 @@
 package com.example.demo.services;
 
 import com.example.demo.entities.User;
+import com.example.demo.entities.UserStatus;
 import com.example.demo.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +32,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 
 
+        UserStatus userStatus = user.getUserStatus();
+
+        boolean enabled = (userStatus != null) ? userStatus.isEnabled() : false;
+        boolean accountNonLocked = (userStatus != null) ? !userStatus.isAccountLocked() : false;
+
         return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
+                user.getUsername(),
                 user.getPassword(),
-                user.getUserStatus().isEnabled(),
-                true,
-                true,
+                enabled,
+                true,  // credentialsNonExpired
+                true,  // accountNonExpired
                 !user.getUserStatus().isAccountLocked(),
                 List.of(new SimpleGrantedAuthority("ROLE_USER"))
         );
