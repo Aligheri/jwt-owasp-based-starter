@@ -3,6 +3,7 @@ package com.yevsieiev.authstarter.email;
 import com.yevsieiev.authstarter.exceptions.EmailException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -10,24 +11,26 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-
+@Slf4j
 public class DefaultActivationService implements ActivationService {
     private final EmailConfig emailConfig;
     private final SpringTemplateEngine templateEngine;
     private final Map<String, ActivationData> activationStore = new ConcurrentHashMap<>();
 
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
 
     public DefaultActivationService(
             EmailConfig emailConfig,
             SpringTemplateEngine templateEngine,
-            @Autowired(required = false) JavaMailSender mailSender
+            JavaMailSender mailSender
     ) {
         this.emailConfig = emailConfig;
         this.templateEngine = templateEngine;
@@ -63,32 +66,38 @@ public class DefaultActivationService implements ActivationService {
                 && data.expiry.isAfter(Instant.now());
     }
 
+
     @Override
     public void sendActivationEmail(String email, String code) {
-        if (emailConfig.isEnabled() && mailSender != null) {
-            try {
-                MimeMessage message = mailSender.createMimeMessage();
-                MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        if (!emailConfig.isEnabled()) {
+            log.warn("Email sending is disabled");
+            return;
+        }
 
-                helper.setTo(email);
-                helper.setFrom(emailConfig.getFrom());
-                helper.setSubject("Account Activation");
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-                Context context = new Context();
-                context.setVariable("code", code);
-                context.setVariable("activationUrl",
-                        emailConfig.getActivationBaseUrl() + "?code=" + code);
+            helper.setTo(email);
+            helper.setFrom(emailConfig.getFrom());
+            helper.setSubject("Account Activation");
 
-                String htmlContent = templateEngine.process(
-                        emailConfig.getTemplateName(),
-                        context
-                );
-                helper.setText(htmlContent, true);
+            Context context = new Context();
+            context.setVariable("code", code);
+            context.setVariable("activationUrl",
+                    emailConfig.getActivationBaseUrl() + URLEncoder.encode(code, StandardCharsets.UTF_8));
 
-                mailSender.send(message);
-            } catch (MessagingException e) {
-                throw new EmailException("Failed to send activation email");
-            }
+            String htmlContent = templateEngine.process(
+                    emailConfig.getTemplateName(),
+                    context
+            );
+
+            helper.setText(htmlContent, true);
+            mailSender.send(message);
+            log.info("Activation email sent to {}", email);
+
+        } catch (MessagingException e) {
+            throw new EmailException("Failed to send activation email" + e.getMessage());
         }
     }
 
