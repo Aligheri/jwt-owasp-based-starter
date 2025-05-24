@@ -2,7 +2,6 @@ package com.example.demo.services;
 
 import com.example.demo.entities.User;
 import com.example.demo.entities.UserStatus;
-import com.example.demo.repositories.TokenRepository;
 import com.example.demo.repositories.UserRepository;
 import com.yevsieiev.authstarter.dto.request.login.DefaultAuthRequest;
 import com.yevsieiev.authstarter.dto.request.register.DefaultRegistrationRequest;

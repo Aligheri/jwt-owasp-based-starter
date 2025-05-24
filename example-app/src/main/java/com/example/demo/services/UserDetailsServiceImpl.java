@@ -35,7 +35,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         UserStatus userStatus = user.getUserStatus();
 
         boolean enabled = (userStatus != null) ? userStatus.isEnabled() : false;
-        boolean accountNonLocked = (userStatus != null) ? !userStatus.isAccountLocked() : false;
 
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
