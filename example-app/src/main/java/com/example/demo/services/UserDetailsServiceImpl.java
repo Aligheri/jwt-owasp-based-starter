@@ -40,8 +40,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 user.getUsername(),
                 user.getPassword(),
                 enabled,
-                true,  // credentialsNonExpired
-                true,  // accountNonExpired
+                true,
+                true,
                 !user.getUserStatus().isAccountLocked(),
                 List.of(new SimpleGrantedAuthority("ROLE_USER"))
         );
