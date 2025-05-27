@@ -22,15 +22,18 @@ public class FingerprintUtils {
     private static final String FINGERPRINT_PATTERN = "^[a-zA-Z0-9]{100}$";
     private static final String HASH_ALGORITHM = "SHA-256";
     private final CookieUtils cookieUtils;
+    private final SecureRandom secureRandom;
 
-    public static String generateFingerprint() {
-        SecureRandom secureRandom = new SecureRandom();
+    public String generateFingerprint() {
         byte[] randomBytes = new byte[FINGERPRINT_LENGTH];
         secureRandom.nextBytes(randomBytes);
         return Hex.encodeHexString(randomBytes);
     }
 
     public static String hashFingerprint(String fingerprint) {
+        if (fingerprint == null || fingerprint.length() != FINGERPRINT_LENGTH * 2) {
+            throw new InvalidFingerprintException("Invalid fingerprint");
+        }
         try {
             MessageDigest digest = MessageDigest.getInstance(HASH_ALGORITHM);
             byte[] hashBytes = digest.digest(fingerprint.getBytes(StandardCharsets.UTF_8));
