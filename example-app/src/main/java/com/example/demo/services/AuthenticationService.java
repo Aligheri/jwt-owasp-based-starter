@@ -10,6 +10,7 @@ import com.yevsieiev.authstarter.dto.response.register.DefaultRegisterResponse;
 import com.yevsieiev.authstarter.email.ActivationService;
 
 import com.yevsieiev.authstarter.utils.CookieUtils;
+import com.yevsieiev.authstarter.utils.FingerprintUtils;
 import com.yevsieiev.authstarter.utils.JwtTokenProvider;
 import com.yevsieiev.authstarter.jwt.TokenCipher;
 import com.yevsieiev.authstarter.jwt.TokenRevoker;
@@ -44,7 +45,8 @@ public class AuthenticationService extends DefaultAuthenticationService<
             PasswordEncoder passwordEncoder,
             ActivationService activationService,
             ApplicationEventPublisher eventPublisher,
-            CookieUtils cookieUtils
+            CookieUtils cookieUtils,
+            FingerprintUtils fingerprintUtils
     ) {
         super(
                 authenticationManager,
@@ -54,7 +56,8 @@ public class AuthenticationService extends DefaultAuthenticationService<
                 DefaultRegisterResponse::new,
                 cookieUtils,
                 jwtTokenProvider,
-                eventPublisher
+                eventPublisher,
+                fingerprintUtils
         );
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -107,7 +110,7 @@ public class AuthenticationService extends DefaultAuthenticationService<
         userStatus.setEnabled(true);
         user.setUserStatus(userStatus);
         userRepository.save(user);
-        log.info("Активовано акаунт для {}: accountLocked={}, enabled={}",
+        log.info("Account activated for {}: accountLocked={}, enabled={}",
                 email, userStatus.isAccountLocked(), userStatus.isEnabled());
         activationService.invalidateCode(email);
     }

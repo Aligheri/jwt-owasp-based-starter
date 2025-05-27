@@ -35,7 +35,7 @@ public class CookieUtils {
                 .secure(true)
                 .path("/")
                 .maxAge(maxAge)
-                .sameSite("Lax")
+                .sameSite("Strict")
                 .build();
     }
 
@@ -56,5 +56,4 @@ public class CookieUtils {
                 .build();
         response.addHeader("Set-Cookie", cookie.toString());
     }
-
 }

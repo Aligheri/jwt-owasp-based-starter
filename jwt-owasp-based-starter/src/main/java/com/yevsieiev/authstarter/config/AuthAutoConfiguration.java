@@ -1,9 +1,6 @@
 package com.yevsieiev.authstarter.config;
 
 import com.auth0.jwt.algorithms.Algorithm;
-import com.yevsieiev.authstarter.email.ActivationService;
-import com.yevsieiev.authstarter.email.DefaultActivationService;
-import com.yevsieiev.authstarter.email.EmailConfig;
 import com.yevsieiev.authstarter.event.AuthEventHandler;
 import com.yevsieiev.authstarter.event.service.LoginMetricsCounter;
 import com.yevsieiev.authstarter.exceptions.RegisterException;
@@ -32,6 +29,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.security.SecureRandom;
 
 /**
  * Auto-configuration for JWT authentication.
@@ -87,9 +85,14 @@ public class AuthAutoConfiguration {
     }
 
     @Bean
+    public SecureRandom secureRandom() {
+        return new SecureRandom();
+    }
+
+    @Bean
     @ConditionalOnMissingBean
-    public FingerprintUtils fingerprintUtils(CookieUtils cookieUtils) {
-        return new FingerprintUtils(cookieUtils);
+    public FingerprintUtils fingerprintUtils(CookieUtils cookieUtils, SecureRandom secureRandom) {
+        return new FingerprintUtils(cookieUtils, secureRandom);
     }
 
     @Bean

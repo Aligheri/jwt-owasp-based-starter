@@ -5,6 +5,7 @@ import com.yevsieiev.authstarter.dto.request.register.RegisterRequest;
 import com.yevsieiev.authstarter.dto.response.login.AuthResponse;
 import com.yevsieiev.authstarter.dto.response.register.RegisterResponse;
 import com.yevsieiev.authstarter.event.AuthSuccessEvent;
+import com.yevsieiev.authstarter.exceptions.*;
 import com.yevsieiev.authstarter.utils.CookieUtils;
 import com.yevsieiev.authstarter.utils.FingerprintUtils;
 import com.yevsieiev.authstarter.utils.JwtTokenProvider;
@@ -18,6 +19,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.function.Supplier;
@@ -44,6 +46,7 @@ public abstract class DefaultAuthenticationService<
     private final CookieUtils cookieUtils;
     private final JwtTokenProvider jwtTokenProvider;
     private final ApplicationEventPublisher eventPublisher;
+    private final FingerprintUtils fingerprintUtils;
 
     @Override
     public R authenticateUser(T loginRequest, HttpServletResponse response, String issuerId) {
@@ -57,7 +60,7 @@ public abstract class DefaultAuthenticationService<
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            String fingerprint = FingerprintUtils.generateFingerprint();
+            String fingerprint = fingerprintUtils.generateFingerprint();
             logger.debug("Generated fingerprint: {}", fingerprint);
             cookieUtils.setFingerprintCookie(response, fingerprint);
 
@@ -78,9 +81,15 @@ public abstract class DefaultAuthenticationService<
 
             return authResponse;
 
+        } catch (AuthenticationException e) {
+            logger.warn("Auth failure for {}", loginRequest.getIdentifier());
+            throw new AuthenticationFailureException("Invalid credentials", e);
+        } catch (TokenEncyptionException e) {
+            logger.error("Token security breach", e);
+            throw new ServiceSecurityException("Token processing failure", e);
         } catch (Exception e) {
-            logger.error("Error during authentication", e);
-            throw new RuntimeException("Error during authentication: " + e.getMessage());
+            logger.error("System authentication failure", e);
+            throw new AuthServiceException("Global auth failure", e);
         }
     }
 
@@ -101,10 +110,16 @@ public abstract class DefaultAuthenticationService<
             registerResponse.setMessage("Logged out successfully!");
             return registerResponse;
 
-        } catch (Exception e) {
+        } catch (TokenRevocationException e) {
             logger.error("Error during logout", e);
             V registerResponse = registerResponseSupplier.get();
             registerResponse.setMessage("Error during logout: " + e.getMessage());
+            return registerResponse;
+        }
+        catch (Exception e) {
+            logger.error("System logout failure", e);
+            V registerResponse = registerResponseSupplier.get();
+            registerResponse.setMessage("System logout failure: " + e.getMessage());
             return registerResponse;
         }
     }
