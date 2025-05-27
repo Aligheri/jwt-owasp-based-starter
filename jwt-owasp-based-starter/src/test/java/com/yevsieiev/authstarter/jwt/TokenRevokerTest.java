@@ -5,8 +5,6 @@ import com.yevsieiev.authstarter.repository.RevokedTokenRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.Optional;
@@ -24,7 +22,7 @@ class TokenRevokerTest {
     private TokenCipher tokenCipher;
 
     @BeforeEach
-    public void setUp() throws GeneralSecurityException, IOException {
+    public void setUp() {
         revokedTokenRepository = mock(RevokedTokenRepository.class);
         tokenCipher = mock(TokenCipher.class);
         tokenRevoker = new TokenRevoker(revokedTokenRepository, tokenCipher);
