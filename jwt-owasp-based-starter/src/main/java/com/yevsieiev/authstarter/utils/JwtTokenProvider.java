@@ -3,6 +3,7 @@ package com.yevsieiev.authstarter.utils;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.yevsieiev.authstarter.config.JwtProperties;
 import com.yevsieiev.authstarter.exceptions.*;
@@ -12,7 +13,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.security.GeneralSecurityException;
 import java.time.Instant;
 import java.util.Date;
 
@@ -46,7 +46,7 @@ public class JwtTokenProvider {
             String token = decryptToken(encryptedToken);
 
             String fingerprint = fingerprintUtils.validateFingerprint(request);
-            String fingerprintHash = fingerprintUtils.hashFingerprint(fingerprint);
+            String fingerprintHash = FingerprintUtils.hashFingerprint(fingerprint);
 
             verifyTokenClaims(token, fingerprintHash);
 
@@ -55,28 +55,23 @@ public class JwtTokenProvider {
         } catch (TokenValidationException e) {
             log.warn("Token validation failed: {}", e.getMessage());
             return false;
-        } catch (Exception e) {
-            log.error("Unexpected error during token validation", e);
-            return false;
         }
     }
 
-    private String decryptToken(String encryptedToken) throws TokenDecryptionException {
-        try {
-            return tokenCipher.decipherToken(encryptedToken);
-        } catch (GeneralSecurityException e) {
-            throw new TokenDecryptionException("Token decryption failed", e);
-        }
+    private String decryptToken(String encryptedToken) {
+        return tokenCipher.decipherToken(encryptedToken);
+
     }
 
-    private void verifyTokenClaims(String token, String fingerprintHash) {
+    private DecodedJWT verifyTokenClaims(String token, String fingerprintHash) {
         JWTVerifier verifier = JWT.require(jwtAlgorithm)
                 .withIssuer(jwtProperties.getIssuerId())
                 .withClaim("fingerprint", fingerprintHash)
+                .acceptNotBefore(Instant.now().getEpochSecond())
+                .acceptExpiresAt(5)
                 .build();
-
-        DecodedJWT decodedToken = verifier.verify(token);
-        logSecurityDetails(decodedToken);
+        logSecurityDetails(verifier.verify(token));
+        return verifier.verify(token);
     }
 
     private void logSecurityDetails(DecodedJWT decodedToken) {
@@ -90,13 +85,9 @@ public class JwtTokenProvider {
     public String getUsernameFromToken(String encryptedToken) {
         try {
             String token = decryptToken(encryptedToken);
-            return JWT.require(jwtAlgorithm)
-                    .withIssuer(jwtProperties.getIssuerId())
-                    .build()
-                    .verify(token)
-                    .getSubject();
-        } catch (TokenValidationException e) {
-            throw new InvalidTokenException("Failed to extract username");
+            return JWT.decode(token).getSubject();
+        } catch (JWTDecodeException e) {
+            throw new InvalidTokenException("Invalid token format");
         }
     }
 }
