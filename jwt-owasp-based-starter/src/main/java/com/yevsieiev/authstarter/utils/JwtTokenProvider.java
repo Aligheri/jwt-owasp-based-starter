@@ -85,6 +85,7 @@ public class JwtTokenProvider {
     public String getUsernameFromToken(String encryptedToken) {
         try {
             String token = decryptToken(encryptedToken);
+            log.info("Decrypted Token: " + token );
             return JWT.decode(token).getSubject();
         } catch (JWTDecodeException e) {
             throw new InvalidTokenException("Invalid token format");

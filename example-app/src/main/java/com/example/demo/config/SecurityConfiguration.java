@@ -46,24 +46,25 @@ public class SecurityConfiguration extends SecurityConfigurerAdapter<DefaultSecu
                 )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/auth/**",
-                                "api/auth/register",
+                                "/api/auth/register",
                                 "/",
                                 "/auth.js",
                                 "/css/**",
                                 "/js/**",
                                 "/login",
-                                "/dashboard",
                                 "/logout",
                                 "/register",
+                                "/dashboard",
+                                ("/favicon.ico"),
                                 "/activate-account",
                                 "/h2-console/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/user").permitAll()
                         .anyRequest().authenticated()
                 )
-                .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/dashboard", true)
-                )
+//                .oauth2Login(oauth2 -> oauth2
+//                        .loginPage("/login")
+//                        .defaultSuccessUrl("/dashboard", true)
+//                )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

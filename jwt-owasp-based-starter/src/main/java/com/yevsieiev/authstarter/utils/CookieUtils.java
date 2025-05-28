@@ -52,7 +52,7 @@ public class CookieUtils {
                 .secure(true)
                 .path("/")
                 .maxAge(0)
-                .sameSite("Lax")
+                .sameSite("Strict")
                 .build();
         response.addHeader("Set-Cookie", cookie.toString());
     }
