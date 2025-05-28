@@ -1,0 +1,6 @@
+com/yevsieiev/authstarter/jwt/TokenRevokerTest.class
+com/yevsieiev/authstarter/jwt/TokenCipherTest$TestTokenCipher.class
+com/yevsieiev/authstarter/utils/JwtTokenProviderTest.class
+com/yevsieiev/authstarter/jwt/TokenCipherTest.class
+com/yevsieiev/authstarter/jwt/TokenRevokerTest$1.class
+com/yevsieiev/authstarter/email/EmailConfigTest.class
