@@ -91,14 +91,14 @@ public class AuthAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public FingerprintUtils fingerprintUtils(CookieUtils cookieUtils, SecureRandom secureRandom) {
-        return new FingerprintUtils(cookieUtils, secureRandom);
+    public FingerprintUtils fingerprintUtils(SecureRandom secureRandom) {
+        return new FingerprintUtils(secureRandom);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public CookieUtils cookieUtils(JwtProperties jwtProperties) {
-        return new CookieUtils(jwtProperties);
+    public CookieProvider cookieUtils(JwtProperties jwtProperties) {
+        return new CookieProvider(jwtProperties);
     }
 
     @Bean
@@ -112,18 +112,29 @@ public class AuthAutoConfiguration {
     public JwtTokenProvider jwtTokenProvider(
             JwtProperties jwtProperties,
             TokenCipher tokenCipher,
-            TokenRevoker tokenRevoker,
-            FingerprintUtils fingerprintUtils,
             Algorithm jwtAlgorithm
     ) {
-        return new JwtTokenProvider(jwtProperties, tokenCipher, tokenRevoker, fingerprintUtils, jwtAlgorithm);
+        return new JwtTokenProvider(jwtProperties, tokenCipher, jwtAlgorithm);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public CookieValidationUtils cookieValidationUtils(JwtProperties jwtProperties, JwtTokenProvider jwtTokenProvider) {
+        return new CookieValidationUtils(jwtProperties, jwtTokenProvider);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public TokenValidationUtils tokenValidationUtils(JwtProperties jwtProperties, TokenCipher tokenCipher, TokenRevoker tokenRevoker,
+                                                     com.auth0.jwt.algorithms.Algorithm jwtAlgorithm, CookieProvider cookieProvider) {
+        return new TokenValidationUtils(jwtProperties, tokenCipher, tokenRevoker, jwtAlgorithm, cookieProvider);
     }
 
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnBean({UserDetailsService.class, JwtTokenProvider.class})
-    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService) {
-        return new JwtAuthenticationFilter(jwtTokenProvider, userDetailsService);
+    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService, CookieValidationUtils cookieValidationUtils, TokenValidationUtils tokenValidationUtils) {
+        return new JwtAuthenticationFilter(jwtTokenProvider, userDetailsService, cookieValidationUtils, tokenValidationUtils);
     }
 
     @Bean
