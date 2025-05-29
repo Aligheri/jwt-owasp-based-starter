@@ -44,9 +44,7 @@
             </div>
             <button type="submit">Login</button>
         </form>
-        <div class="container unauthenticated">
-            With GitHub: <a href="/oauth2/authorization/github">click here</a>
-        </div>
+
         <div class="container authenticated" style="display:none">
             Logged in as: <span id="user"></span>
         </div>
@@ -54,28 +52,6 @@
             <p>Don't have an account? <a href="/register">Register here</a></p>
         </div>
     </div>
-    <script type="text/javascript">
-        $.get("/user", function(data) {
-            if (data.name) {
-                $("#user").html(data.name);
-                $(".unauthenticated").hide()
-                $(".authenticated").show()
-
-                // Store JWT token if available
-                if (data.token) {
-                    console.log("Storing JWT token from OAuth login");
-                    setToken(data.token);
-                }
-
-                // Redirect to dashboard if authenticated via OAuth
-                window.location.href = '/dashboard';
-            } else {
-                console.log("Not authenticated via OAuth");
-            }
-        }).fail(function() {
-            console.log("Error checking OAuth authentication");
-        });
-    </script>
     <script th:src="@{/js/auth.js}"></script>
     <script>
         // Check if already authenticated
@@ -107,6 +83,21 @@
                     loginError.innerHTML = errorMessage;
                     loginError.style.display = 'block';
                 });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('login-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                try {
+                    await auth.login(username, password);
+                } catch (error) {
+                    document.getElementById('login-error').textContent = error.message;
+                }
+            });
         });
     </script>
 </body>

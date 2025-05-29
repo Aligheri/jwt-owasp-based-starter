@@ -5,6 +5,7 @@
 /home/user/Downloads/Telegram Desktop/jwt-owasp-based-starter/jwt-owasp-based-starter/src/main/java/com/yevsieiev/authstarter/exceptions/TokenEncyptionException.java
 /home/user/Downloads/Telegram Desktop/jwt-owasp-based-starter/jwt-owasp-based-starter/src/main/java/com/yevsieiev/authstarter/email/EmailConfig.java
 /home/user/Downloads/Telegram Desktop/jwt-owasp-based-starter/jwt-owasp-based-starter/src/main/java/com/yevsieiev/authstarter/dto/request/register/DefaultRegistrationRequest.java
+/home/user/Downloads/Telegram Desktop/jwt-owasp-based-starter/jwt-owasp-based-starter/src/main/java/com/yevsieiev/authstarter/utils/CookieValidationUtils.java
 /home/user/Downloads/Telegram Desktop/jwt-owasp-based-starter/jwt-owasp-based-starter/src/main/java/com/yevsieiev/authstarter/utils/FingerprintUtils.java
 /home/user/Downloads/Telegram Desktop/jwt-owasp-based-starter/jwt-owasp-based-starter/src/main/java/com/yevsieiev/authstarter/exceptions/AuthServiceException.java
 /home/user/Downloads/Telegram Desktop/jwt-owasp-based-starter/jwt-owasp-based-starter/src/main/java/com/yevsieiev/authstarter/dto/request/login/DefaultAuthRequest.java
@@ -29,10 +30,12 @@
 /home/user/Downloads/Telegram Desktop/jwt-owasp-based-starter/jwt-owasp-based-starter/src/main/java/com/yevsieiev/authstarter/exceptions/ServiceSecurityException.java
 /home/user/Downloads/Telegram Desktop/jwt-owasp-based-starter/jwt-owasp-based-starter/src/main/java/com/yevsieiev/authstarter/event/AuthSuccessEvent.java
 /home/user/Downloads/Telegram Desktop/jwt-owasp-based-starter/jwt-owasp-based-starter/src/main/java/com/yevsieiev/authstarter/email/ActivationService.java
-/home/user/Downloads/Telegram Desktop/jwt-owasp-based-starter/jwt-owasp-based-starter/src/main/java/com/yevsieiev/authstarter/utils/CookieUtils.java
+/home/user/Downloads/Telegram Desktop/jwt-owasp-based-starter/jwt-owasp-based-starter/src/main/java/com/yevsieiev/authstarter/exceptions/FingerprintValidationException.java
 /home/user/Downloads/Telegram Desktop/jwt-owasp-based-starter/jwt-owasp-based-starter/src/main/java/com/yevsieiev/authstarter/exceptions/TokenDecryptionException.java
+/home/user/Downloads/Telegram Desktop/jwt-owasp-based-starter/jwt-owasp-based-starter/src/main/java/com/yevsieiev/authstarter/utils/TokenValidationUtils.java
 /home/user/Downloads/Telegram Desktop/jwt-owasp-based-starter/jwt-owasp-based-starter/src/main/java/com/yevsieiev/authstarter/utils/JwtTokenProvider.java
 /home/user/Downloads/Telegram Desktop/jwt-owasp-based-starter/jwt-owasp-based-starter/src/main/java/com/yevsieiev/authstarter/jwt/JwtAuthenticationFilter.java
+/home/user/Downloads/Telegram Desktop/jwt-owasp-based-starter/jwt-owasp-based-starter/src/main/java/com/yevsieiev/authstarter/utils/CookieProvider.java
 /home/user/Downloads/Telegram Desktop/jwt-owasp-based-starter/jwt-owasp-based-starter/src/main/java/com/yevsieiev/authstarter/event/AuthEventHandler.java
 /home/user/Downloads/Telegram Desktop/jwt-owasp-based-starter/jwt-owasp-based-starter/src/main/java/com/yevsieiev/authstarter/config/ActivationAutoConfiguration.java
 /home/user/Downloads/Telegram Desktop/jwt-owasp-based-starter/jwt-owasp-based-starter/src/main/java/com/yevsieiev/authstarter/exceptions/HashFingerprintException.java

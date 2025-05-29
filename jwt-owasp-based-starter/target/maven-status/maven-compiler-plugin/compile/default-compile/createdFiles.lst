@@ -32,7 +32,6 @@ com/yevsieiev/authstarter/jwt/JwtAuthenticationFilter.class
 com/yevsieiev/authstarter/jwt/TokenCipher.class
 com/yevsieiev/authstarter/exceptions/EmailException.class
 com/yevsieiev/authstarter/exceptions/TokenValidationException.class
-com/yevsieiev/authstarter/utils/CookieUtils.class
 com/yevsieiev/authstarter/dto/response/login/DefaultAuthResponse$DefaultAuthResponseBuilder.class
 com/yevsieiev/authstarter/utils/JwtTokenProvider.class
 com/yevsieiev/authstarter/exceptions/SecurityConfigurationException.class
