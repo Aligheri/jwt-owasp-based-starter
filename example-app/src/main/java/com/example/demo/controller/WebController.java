@@ -2,9 +2,12 @@ package com.example.demo.controller;
 
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,18 +53,6 @@ public class WebController {
         return "login";
     }
     /**
-     * OAuth 2
-     */
-    @GetMapping("/user")
-    public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
-        if (principal == null) {
-            return Collections.singletonMap("authenticated", false);
-        }
-            Map<String, Object> result = new HashMap<>();
-            result.put("name", principal.getAttribute("name"));
-            return result;
-    }
-    /**
      * Dashboard page - displays the JWT token and fingerprint cookie
      */
     @GetMapping("/dashboard")
@@ -69,6 +60,14 @@ public class WebController {
         return "dashboard";
     }
 
+    @GetMapping("/dashboard/data")
+    @ResponseBody
+    public Map<String, String> dashboardData(@AuthenticationPrincipal UserDetails userDetails) {
+        return Map.of(
+                "username", userDetails.getUsername(),
+                "email", userDetails.getUsername() + "@example.com"
+        );
+    }
     /**
      * Logout confirmation page
      */

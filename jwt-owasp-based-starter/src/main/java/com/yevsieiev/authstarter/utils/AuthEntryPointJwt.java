@@ -13,6 +13,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import java.io.IOException;
 import java.time.Instant;
 
+
 /**
  * JWT Authentication Entry Point to handle unauthorized requests.
  */
@@ -44,7 +45,7 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
                 "Unauthorized",
                 "Authentication failed",
                 request.getServletPath(),
-                Instant.now(),
+                Instant.now().toString(),
                 "ERR-401-AUTH"
         );
 
@@ -61,7 +62,7 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
             String error,
             String message,
             String path,
-            Instant timestamp,
+            String timestamp,
             String errorCode
     ) {
     }

@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -48,21 +49,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         try {
             final String cipheredToken = authHeader.substring(7);
+            log.info("Processing request to: {}", request.getRequestURI());
+            log.info("Token present: {}", cipheredToken != null);
 
             if (!tokenValidationUtils.validateToken(cipheredToken, request)) {
                 throw new AuthenticationCredentialsNotFoundException("Invalid token");
             }
-
-            if (!cookieValidationUtils.isValidCookie(request)) {
+            log.info("Token validation passed");
+            if (!cookieValidationUtils.isValidCookie(request, cipheredToken)) {
                 log.warn("Cookie validation failed for request to: {}", request.getRequestURI());
                 throw new AuthenticationCredentialsNotFoundException("Invalid or missing fingerprint cookie");
             }
-
+            log.info("Cookie validation passed");
 
             String username = jwtTokenProvider.getUsernameFromToken(cipheredToken);
-
+            log.info("Username extracted from token: {}", username);
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                log.info("User details loaded for username: {}", username);
 
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
@@ -70,8 +74,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         userDetails.getAuthorities()
                 );
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                log.info("Authentication token created");
 
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+                log.info("Authentication token set to security context");
                 log.debug("JwtAuthenticationFilter successfully passed request");
             }
 
@@ -79,10 +85,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.clearContext();
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage());
             return;
-        } finally {
-            SecurityContextHolder.clearContext();
         }
-
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        log.info("Before proceeding to next filter - Authentication present: {}, is authenticated: {}",
+                auth != null, auth != null && auth.isAuthenticated());
         filterChain.doFilter(request, response);
+        log.info("=== JWT Filter END ===");
+        log.debug("JwtAuthenticationFilter successfully passed request");
     }
 }

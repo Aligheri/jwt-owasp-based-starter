@@ -6,7 +6,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -17,12 +16,12 @@ import static com.yevsieiev.authstarter.utils.FingerprintUtils.*;
 public class CookieValidationUtils {
     private final JwtProperties jwtProperties;
     private final JwtTokenProvider jwtTokenProvider;
-    private static final int FINGERPRINT_LENGTH = 100;
-    private static final String FINGERPRINT_PATTERN = "^[a-zA-Z0-9]{100}$";
+    private static final int FINGERPRINT_LENGTH = 200;
+    private static final String FINGERPRINT_PATTERN = "^[a-f0-9]{200}$";
 
-    public boolean isValidCookie(HttpServletRequest request) {
+    public boolean isValidCookie(HttpServletRequest request , String token) {
         try {
-            validateCookie(request);
+            validateCookie(request,token);
             return true;
         } catch (FingerprintValidationException e) {
             log.warn("Cookie validation failed: {}", e.getMessage());
@@ -84,17 +83,8 @@ public class CookieValidationUtils {
      * Validates cookie security flags (HttpOnly, Secure, SameSite)
      */
     private void validateCookieFlags(Cookie cookie, HttpServletRequest request) throws FingerprintValidationException {
-        if (!cookie.isHttpOnly()) {
-            throw new FingerprintValidationException("Fingerprint cookie must have HttpOnly flag set");
-        }
-
         if (request.isSecure() && !cookie.getSecure()) {
             throw new FingerprintValidationException("Fingerprint cookie must have Secure flag set for HTTPS requests");
-        }
-
-        String expectedPath = "/";
-        if (!expectedPath.equals(cookie.getPath())) {
-            log.warn("Cookie path mismatch. Expected: {}, Actual: {}", expectedPath, cookie.getPath());
         }
     }
 
@@ -117,12 +107,16 @@ public class CookieValidationUtils {
      * @param rawFingerprint Raw fingerprint from cookie
      * @return true if fingerprints match
      */
-    public boolean validateFingerprintMatch(String rawFingerprint) {
+    public boolean validateFingerprintMatch(String rawFingerprint , String token) {
         try {
-            String tokenFingerprintHash = jwtTokenProvider.getHashedFingerprintFromToken(rawFingerprint);
+            String tokenFingerprintHash = jwtTokenProvider.getHashedFingerprintFromToken(token);
             String hashedFingerprint = hashFingerprint(rawFingerprint);
             boolean matches = hashedFingerprint.equals(tokenFingerprintHash);
+            log.info("Raw fingerprint from cookie: {}", rawFingerprint);
+            log.info("Hashed fingerprint from cookie: {}", hashedFingerprint);
+            log.info("Fingerprint hash from token: {}", tokenFingerprintHash);
 
+            log.info("Fingerprints match: {}", matches);
             if (!matches) {
                 log.warn("Fingerprint mismatch detected. Cookie fingerprint hash does not match token claim");
             }
@@ -141,12 +135,12 @@ public class CookieValidationUtils {
      * @return validated raw fingerprint
      * @throws FingerprintValidationException if any validation fails
      */
-    public String validateCookie(HttpServletRequest request)
+    public String validateCookie(HttpServletRequest request, String token)
             throws FingerprintValidationException {
 
         String rawFingerprint = validateFingerprintCookie(request);
 
-        if (!validateFingerprintMatch(rawFingerprint)) {
+        if (!validateFingerprintMatch(rawFingerprint, token)) {
             throw new FingerprintValidationException("Fingerprint does not match token claim");
         }
 

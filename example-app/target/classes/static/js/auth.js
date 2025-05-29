@@ -23,6 +23,11 @@ function removeToken() {
     sessionStorage.removeItem('jwt_token');
 }
 
+function authHeader() {
+    const token = getToken();
+    return token ? {'Authorization': `Bearer ${token}`} : {};
+}
+
 // Function to handle registration
 function register(username, email, password) {
     return fetch('/api/auth/register', {
@@ -46,6 +51,33 @@ function register(username, email, password) {
         });
 }
 
+function authenticatedFetch(url, options = {}) {
+    const token = getToken();
+
+    if (!token) {
+        return Promise.reject(new Error('No authentication token'));
+    }
+
+    const defaultOptions = {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    };
+
+    return fetch(url, {...options, ...defaultOptions})
+        .then(response => {
+            if (response.status === 401) {
+                // Token expired or invalid
+                removeToken();
+                window.location.href = '/login';
+                throw new Error('Authentication expired');
+            }
+            return response;
+        });
+}
+
 // Function to handle login
 function login(username, password) {
     return fetch('/api/auth/login', {
@@ -66,6 +98,7 @@ function login(username, password) {
         })
         .then(data => {
             setToken(data.token);
+            console.log("Login successful. Token stored.");
             console.log(data);
             return data;
         });
@@ -81,9 +114,7 @@ function logout() {
 
     return fetch('/api/auth/logout', {
         method: 'POST',
-        headers: {
-            'Authorization': 'Bearer ' + token
-        }
+        headers: authHeader()
     })
         .then(response => {
             removeToken();
