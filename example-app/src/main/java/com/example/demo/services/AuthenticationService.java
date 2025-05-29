@@ -9,7 +9,7 @@ import com.yevsieiev.authstarter.dto.response.login.DefaultAuthResponse;
 import com.yevsieiev.authstarter.dto.response.register.DefaultRegisterResponse;
 import com.yevsieiev.authstarter.email.ActivationService;
 
-import com.yevsieiev.authstarter.utils.CookieUtils;
+import com.yevsieiev.authstarter.utils.CookieProvider;
 import com.yevsieiev.authstarter.utils.FingerprintUtils;
 import com.yevsieiev.authstarter.utils.JwtTokenProvider;
 import com.yevsieiev.authstarter.jwt.TokenCipher;
@@ -45,7 +45,7 @@ public class AuthenticationService extends DefaultAuthenticationService<
             PasswordEncoder passwordEncoder,
             ActivationService activationService,
             ApplicationEventPublisher eventPublisher,
-            CookieUtils cookieUtils,
+            CookieProvider cookieProvider,
             FingerprintUtils fingerprintUtils
     ) {
         super(
@@ -54,7 +54,7 @@ public class AuthenticationService extends DefaultAuthenticationService<
                 tokenRevoker,
                 DefaultAuthResponse::new,
                 DefaultRegisterResponse::new,
-                cookieUtils,
+                cookieProvider,
                 jwtTokenProvider,
                 eventPublisher,
                 fingerprintUtils
