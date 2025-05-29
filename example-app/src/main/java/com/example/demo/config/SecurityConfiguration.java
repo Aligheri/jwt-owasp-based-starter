@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -35,15 +36,12 @@ public class SecurityConfiguration extends SecurityConfigurerAdapter<DefaultSecu
         http
                 .cors(withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                // Disable frame options for H2 console
-                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
+                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(unauthorizedHandler)
                 )
-
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(STATELESS)
-                )
+                        .sessionCreationPolicy(STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/auth/**",
                                 "/api/auth/register",
@@ -55,16 +53,13 @@ public class SecurityConfiguration extends SecurityConfigurerAdapter<DefaultSecu
                                 "/logout",
                                 "/register",
                                 "/dashboard",
-                                ("/favicon.ico"),
+                                "/favicon.ico",
+                                "/error",
                                 "/activate-account",
                                 "/h2-console/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/user").permitAll()
                         .anyRequest().authenticated()
                 )
-//                .oauth2Login(oauth2 -> oauth2
-//                        .loginPage("/login")
-//                        .defaultSuccessUrl("/dashboard", true)
-//                )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
