@@ -1,6 +1,8 @@
 package com.yevsieiev.authstarter.jwt;
 
+import com.yevsieiev.authstarter.utils.CookieValidationUtils;
 import com.yevsieiev.authstarter.utils.JwtTokenProvider;
+import com.yevsieiev.authstarter.utils.TokenValidationUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,6 +31,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService;
+    private final CookieValidationUtils cookieValidationUtils;
+    private final TokenValidationUtils tokenValidationUtils;
 
     @Override
     protected void doFilterInternal(
@@ -45,9 +49,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             final String cipheredToken = authHeader.substring(7);
 
-            if (!jwtTokenProvider.validateToken(cipheredToken, request)) {
+            if (!tokenValidationUtils.validateToken(cipheredToken, request)) {
                 throw new AuthenticationCredentialsNotFoundException("Invalid token");
             }
+
+            if (!cookieValidationUtils.isValidCookie(request)) {
+                log.warn("Cookie validation failed for request to: {}", request.getRequestURI());
+                throw new AuthenticationCredentialsNotFoundException("Invalid or missing fingerprint cookie");
+            }
+
 
             String username = jwtTokenProvider.getUsernameFromToken(cipheredToken);
 
