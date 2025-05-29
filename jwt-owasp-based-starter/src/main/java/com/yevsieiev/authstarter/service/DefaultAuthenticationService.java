@@ -6,7 +6,7 @@ import com.yevsieiev.authstarter.dto.response.login.AuthResponse;
 import com.yevsieiev.authstarter.dto.response.register.RegisterResponse;
 import com.yevsieiev.authstarter.event.AuthSuccessEvent;
 import com.yevsieiev.authstarter.exceptions.*;
-import com.yevsieiev.authstarter.utils.CookieUtils;
+import com.yevsieiev.authstarter.utils.CookieProvider;
 import com.yevsieiev.authstarter.utils.FingerprintUtils;
 import com.yevsieiev.authstarter.utils.JwtTokenProvider;
 import com.yevsieiev.authstarter.jwt.TokenCipher;
@@ -43,7 +43,7 @@ public abstract class DefaultAuthenticationService<
     private final TokenRevoker tokenRevoker;
     private final Supplier<R> authResponseSupplier;
     private final Supplier<V> registerResponseSupplier;
-    private final CookieUtils cookieUtils;
+    private final CookieProvider cookieProvider;
     private final JwtTokenProvider jwtTokenProvider;
     private final ApplicationEventPublisher eventPublisher;
     private final FingerprintUtils fingerprintUtils;
@@ -62,7 +62,7 @@ public abstract class DefaultAuthenticationService<
 
             String fingerprint = fingerprintUtils.generateFingerprint();
             logger.debug("Generated fingerprint: {}", fingerprint);
-            cookieUtils.setFingerprintCookie(response, fingerprint);
+            cookieProvider.setFingerprintCookie(response, fingerprint);
 
             String fingerprintHash = FingerprintUtils.hashFingerprint(fingerprint);
             logger.debug("Generated fingerprint hash: {}", fingerprintHash);
@@ -103,7 +103,7 @@ public abstract class DefaultAuthenticationService<
     @Override
     public V logout(String jwtToken, HttpServletResponse response, String cookieName) {
         try {
-            cookieUtils.deleteCookie(response, cookieName);
+            cookieProvider.deleteCookie(response, cookieName);
             tokenRevoker.revokeToken(jwtToken);
 
             V registerResponse = registerResponseSupplier.get();
