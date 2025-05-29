@@ -5,14 +5,15 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseCookie;
 
 import java.util.Arrays;
 import java.util.Optional;
 
 @RequiredArgsConstructor
-public class CookieUtils {
-
+@Slf4j
+public class CookieProvider {
     private final JwtProperties jwtProperties;
 
     public void setFingerprintCookie(HttpServletResponse response, String fingerprint) {
