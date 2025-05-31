@@ -1,8 +1,12 @@
 package com.yevsieiev.authstarter.utils;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.yevsieiev.authstarter.config.JwtProperties;
 import com.yevsieiev.authstarter.exceptions.*;
 import com.yevsieiev.authstarter.jwt.TokenCipher;
@@ -19,7 +23,12 @@ public class JwtTokenProvider {
     private final TokenCipher tokenCipher;
     private final Algorithm jwtAlgorithm;
 
+
     public String generateToken(String username, String fingerprintHash) {
+        if (username == null || username.isEmpty()) {
+            throw new IllegalArgumentException("Username cannot be null or empty");
+        }
+
         Instant now = Instant.now();
         return JWT.create()
                 .withSubject(username)
@@ -31,21 +40,42 @@ public class JwtTokenProvider {
     }
 
     public String getUsernameFromToken(String encryptedToken) {
+        if (encryptedToken == null) {
+            throw new IllegalArgumentException("Token cannot be null");
+        }
+
         try {
             String token = tokenCipher.decipherToken(encryptedToken);
             log.info("Decrypted Token: {}", token);
-            return JWT.decode(token).getSubject();
+
+            // Add proper verification
+            JWTVerifier verifier = JWT.require(jwtAlgorithm)
+                    .withIssuer(jwtProperties.getIssuerId())
+                    .build();
+
+            DecodedJWT jwt = verifier.verify(token);
+            return jwt.getSubject();
         } catch (JWTDecodeException e) {
             throw new InvalidTokenException("Invalid token format");
+        } catch (TokenExpiredException e) {
+            throw new InvalidTokenException("Token has expired");
+        } catch (JWTVerificationException e) {
+            throw new InvalidTokenException("Invalid token: " + e.getMessage());
         }
     }
 
     public String getHashedFingerprintFromToken(String encryptedToken) {
         try {
             String token = tokenCipher.decipherToken(encryptedToken);
-            return JWT.decode(token).getClaim("fingerprint").asString();
+            DecodedJWT jwt = JWT.decode(token);
+
+            String fingerprint = jwt.getClaim("fingerprint").asString();
+            if (fingerprint == null) {
+                throw new HashFingerprintException("Fingerprint claim missing from token");
+            }
+            return fingerprint;
         } catch (JWTDecodeException e) {
-            throw new RuntimeException(e);
+            throw new InvalidTokenException("Invalid token format");
         }
     }
 }
