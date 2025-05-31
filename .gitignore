@@ -25,6 +25,9 @@ replay_pid*
 
 # Maven
 target/
+**/build/
+**/out/
+**/bin/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
