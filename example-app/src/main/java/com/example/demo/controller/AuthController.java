@@ -45,11 +45,11 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<DefaultRegisterResponse> registerUser(@Valid @RequestBody DefaultRegistrationRequest defaultRegistrationRequest) {
         logger.info("Attempting to register user: {}", defaultRegistrationRequest.getUsername());
-        try{
+        try {
             DefaultRegisterResponse defaultRegisterResponse = authenticationService.registerUser(defaultRegistrationRequest);
             logger.info("User registered successfully: {}", defaultRegistrationRequest.getUsername());
             return ResponseEntity.ok(defaultRegisterResponse);
-        }catch (RegisterException e){
+        } catch (RegisterException e) {
             return ResponseEntity.badRequest().body(new DefaultRegisterResponse(e.getMessage()));
         }
     }
@@ -114,23 +114,6 @@ public class AuthController {
         } catch (UsernameNotFoundException e) {
             redirectAttributes.addFlashAttribute("error", "User not found");
             return "redirect:/registration";
-        }
-    }
-
-    /**
-     * Resend activation code
-     *
-     * @param email the email address
-     * @return a response entity with a message
-     */
-    @PostMapping("/resend-activation")
-    public ResponseEntity<DefaultRegisterResponse> resendActivation(@RequestParam String email) {
-        try {
-            logger.info("Attempting to resend activation code to: {}", email);
-            return ResponseEntity.ok(new DefaultRegisterResponse("Activation code resent successfully!"));
-        } catch (Exception e) {
-            logger.error("Error resending activation code: {}", e.getMessage(), e);
-            return ResponseEntity.badRequest().body(new DefaultRegisterResponse("Error: " + e.getMessage()));
         }
     }
 }
