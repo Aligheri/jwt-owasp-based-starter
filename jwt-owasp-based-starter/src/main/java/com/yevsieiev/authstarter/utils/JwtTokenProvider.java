@@ -48,7 +48,6 @@ public class JwtTokenProvider {
             String token = tokenCipher.decipherToken(encryptedToken);
             log.info("Decrypted Token: {}", token);
 
-            // Add proper verification
             JWTVerifier verifier = JWT.require(jwtAlgorithm)
                     .withIssuer(jwtProperties.getIssuerId())
                     .build();
