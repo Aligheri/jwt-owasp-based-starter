@@ -115,8 +115,7 @@ public abstract class DefaultAuthenticationService<
             V registerResponse = registerResponseSupplier.get();
             registerResponse.setMessage("Error during logout: " + e.getMessage());
             return registerResponse;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("System logout failure", e);
             V registerResponse = registerResponseSupplier.get();
             registerResponse.setMessage("System logout failure: " + e.getMessage());
